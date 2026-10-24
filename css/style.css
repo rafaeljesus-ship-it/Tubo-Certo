@@ -796,3 +796,12 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 .pr-stack { min-width: 0; }
 .pr-stack small { white-space: normal; line-height: 1.15; }
 .paper-screen .paper-row .buy-btn, .paper-screen .pink-row .buy-btn { min-width: 25cqw; }
+
+/* etiqueta de dificuldade nas fases do mapa (as fáceis ficam sem etiqueta) */
+.level-tile[data-tag]::after { content: attr(data-tag); position: absolute; top: .9cqw; left: 50%; transform: translateX(-50%); z-index: 3; padding: .7cqw 2cqw; font: 400 2.5cqw/1 var(--display); letter-spacing: .04em; color: #fff; border: 2px solid var(--ink); border-radius: 999px; white-space: nowrap; animation: none; }
+.level-tile.tier-medium[data-tag]::after { background: #ff8a1c; }
+.level-tile.tier-hard[data-tag]::after { background: var(--red); }
+.level-tile.tier-hard:not(.locked) { background: linear-gradient(180deg, #ffb59e, #ff6a50 60%, #d93a22); }
+.level-tile.tier-hard:not(.locked) .num { color: #fff; -webkit-text-stroke: .06em var(--ink); paint-order: stroke fill; }
+.level-tile.tier-medium:not(.locked) { background: linear-gradient(180deg, #ffd7a0, #ffa63a 60%, #e57f12); }
+.level-tile[data-tag] .num { margin-top: 2.4cqw; }

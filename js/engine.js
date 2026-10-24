@@ -158,9 +158,53 @@
   }
 
   var MAX_COLORS = 10;
-  function colorsForLevel(level) { return Math.min(2 + level, MAX_COLORS); }
+  function colorsForLevel(level) { return levelSpec(level).colors; }
   function targetFromOptimal(optimal) { return optimal + 2; }
-  function hardLimitFromOptimal(optimal) { return optimal + Math.max(8, Math.ceil(optimal * 0.8)); }
+  function hardLimitFromOptimal(optimal, tier) {
+    var f = tier === 'hard' ? [6, 0.45] : (tier === 'medium' ? [7, 0.65] : [8, 0.8]);
+    return optimal + Math.max(f[0], Math.ceil(optimal * f[1]));
+  }
+
+  // ---- ritmo de dificuldade: a cada 5 fases = 3 fáceis, 1 média, 1 super difícil ----
+  // Cada bloco de 5 fases aumenta um pouco o número de cores.
+  var TIER_LABEL = { easy: 'FÁCIL', medium: 'MÉDIA', hard: 'DIFÍCIL' };
+  function levelSpec(level) {
+    var block = Math.floor((level - 1) / 5), pos = (level - 1) % 5;
+    var easyColors = 3 + Math.floor((block + 1) / 2);
+    var tier = pos < 3 ? 'easy' : (pos === 3 ? 'medium' : 'hard');
+    var colors = Math.min(MAX_COLORS, easyColors + (tier === 'easy' ? 0 : (tier === 'medium' ? 1 : 2)));
+    // super difícil: só 1 tubo vazio (com até 6 cores é viável); acima disso, 2 vazios e a solução mais longa
+    var empties = (tier === 'hard' && colors <= 6) ? 1 : 2;
+    return { level: level, block: block, tier: tier, label: TIER_LABEL[tier], colors: colors, empties: empties };
+  }
+
+  // Gera a fase do nível. SEMPRE devolve um tabuleiro verificado como solúvel (o solver acha a solução).
+  // Fácil = a solução mais curta entre 6 sorteios; média = uma solução na faixa alta de 6; difícil = a mais longa entre vários.
+  function generateForLevel(level) {
+    var spec = levelSpec(level);
+    var want = spec.tier === 'easy' ? 6 : (spec.tier === 'medium' ? 6 : 10);
+    var budget = Math.min(6000 + spec.colors * 2500, 30000);
+    function collect(empties, maxAttempts) {
+      var cands = [];
+      for (var i = 0; i < maxAttempts && cands.length < want; i++) {
+        var tubes = randomFillTubes(spec.colors, empties);
+        if (isSolved(tubes)) continue;
+        var moves = findSolution(tubes, budget);
+        if (moves === null || moves < Math.max(4, spec.colors)) continue;
+        cands.push({ tubes: tubes, optimal: moves });
+      }
+      return cands;
+    }
+    var empties = spec.empties;
+    var cands = collect(empties, empties === 1 ? 1500 : 60);
+    if (!cands.length && empties === 1) { empties = 2; cands = collect(2, 60); }   // 1 tubo vazio sem solução: cai para 2
+    var guard = 0;
+    while (!cands.length && guard++ < 50) cands = collect(2, 60);                  // nunca devolve fase sem solução
+    cands.sort(function (a, b) { return a.optimal - b.optimal; });
+    var pick = spec.tier === 'easy' ? cands[0] : (spec.tier === 'medium' ? cands[Math.max(0, Math.ceil(cands.length * 0.7) - 1)] : cands[cands.length - 1]);
+    return { tubes: pick.tubes, optimal: pick.optimal, verified: true, spec: spec, empties: empties,
+             target: targetFromOptimal(pick.optimal), hardLimit: hardLimitFromOptimal(pick.optimal, spec.tier) };
+  }
 
   function starsForResult(moves, target, hardLimit) {
     if (moves <= target) return 3;
@@ -193,7 +237,7 @@
     tubeStatus: tubeStatus, randomFillTubes: randomFillTubes, deepClone: deepClone,
     findSolution: findSolution, solvePath: solvePath, generateLevel: generateLevel,
     colorsForLevel: colorsForLevel, targetFromOptimal: targetFromOptimal,
-    hardLimitFromOptimal: hardLimitFromOptimal, starsForResult: starsForResult,
+    hardLimitFromOptimal: hardLimitFromOptimal, levelSpec: levelSpec, generateForLevel: generateForLevel, starsForResult: starsForResult,
     findHint: findHint
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

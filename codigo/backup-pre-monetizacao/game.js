@@ -21,7 +21,8 @@
   function charUrl(n) { return 'assets/personagens/' + n + '.png'; }
   function pieceUrl(name) { return 'assets/jogo/peca-' + name + '.png'; }
 
-  var TEST_MODE = /[?&]teste=1/.test(location.search);
+  var Platform = window.TuboPlatform;
+  var CFG = window.TUBO_CONFIG;
 
   function $(id) { return document.getElementById(id); }
   function ico(id, cls) { return '<svg class="ico ' + (cls || '') + '" aria-hidden="true"><use href="#i-' + id + '"/></svg>'; }
@@ -153,9 +154,10 @@
     $('settingMusic').checked = !!settings.music;
     $('settingSfx').checked = !!settings.sfx;
     $('settingVibration').checked = !!settings.vibration;
-    $('settingsNote').textContent = TEST_MODE
-      ? 'Modo de teste ativo (?teste=1): as compras creditam de graça.'
+    $('settingsNote').textContent = Platform.mode === 'test'
+      ? 'Modo de teste ativo (?teste=1): compras e anúncios são simulados.'
       : 'Suas preferências ficam salvas neste aparelho.';
+    $('settingAdsRow').hidden = Platform.mode !== 'native';
   }
 
   // ===================== Moedas =====================
@@ -233,6 +235,11 @@
     $('livesCoinBuyBtn').disabled = full;
     $('livesBuyOneBtn').disabled = full;
     $('livesBuyFiveBtn').disabled = full;
+    $('livesBuyOneBtn').textContent = Platform.priceOf('vida_1');
+    $('livesBuyFiveBtn').textContent = Platform.priceOf('vidas_5');
+    $('livesAdBtn').disabled = full || adBusy;
+    $('livesAdRow').hidden = !adsOffered();
+    $('livesNote').textContent = 'Cada vida volta sozinha a cada 15 minutos.' + (Platform.mode === 'web' ? ' Compras e anúncios funcionam no app Android.' : '');
     $('lifeCoinCost').textContent = LIFE_COIN_COST;
     renderLives();
   }
@@ -330,12 +337,9 @@
   })();
 
   // ===================== Loja =====================
-  var SHOP_PACKAGES = [
-    { amount: 100, price: 'R$ 4,90', coins: [[32, 4]] },
-    { amount: 500, price: 'R$ 21,90', bonus: '+10%', coins: [[22, 4], [42, 5]] },
-    { amount: 1200, price: 'R$ 42,90', bonus: '+20%', coins: [[16, 4], [32, 6], [48, 4]] },
-    { amount: 2500, price: 'R$ 84,90', bonus: '+35%', coins: [[15, 5], [32, 8], [49, 5]] }
-  ];
+  var COIN_ART = { moedas_100: [[32, 4]], moedas_500: [[22, 4], [42, 5]], moedas_1200: [[16, 4], [32, 6], [48, 4]], moedas_2500: [[15, 5], [32, 8], [49, 5]] };
+  var purchasing = false, adBusy = false;
+  function adsOffered() { return Platform.canShowAds() || Platform.mode === 'web'; }   // no navegador mostra a linha e explica
   // pilhas de moedas desenhadas em SVG: [[x, quantidade], ...]
   function coinStack(cols) {
     var s = '<svg class="stack" viewBox="0 0 64 56" aria-hidden="true">';
@@ -353,26 +357,94 @@
   function renderShop() {
     var list = $('shopList');
     list.innerHTML = '';
-    SHOP_PACKAGES.forEach(function (pkg) {
+    CFG.products.filter(function (p) { return p.kind === 'coins'; }).forEach(function (pkg) {
       var row = document.createElement('div');
       row.className = 'shop-row';
-      row.innerHTML = '<span class="amount">' + coinStack(pkg.coins) + '<span>' + pkg.amount.toLocaleString('pt-BR') + '</span>' +
+      row.innerHTML = '<span class="amount">' + coinStack(COIN_ART[pkg.id] || [[32, 4]]) + '<span>' + pkg.amount.toLocaleString('pt-BR') + '</span>' +
         (pkg.bonus ? '<span class="bonus">' + pkg.bonus + '</span>' : '') + '</span>' +
-        '<button class="buy-btn" type="button">' + pkg.price + '</button>';
-      row.querySelector('button').addEventListener('click', function () { sfxClick(); buyCoins(pkg); });
+        '<button class="buy-btn" type="button">' + Platform.priceOf(pkg.id) + '</button>';
+      row.querySelector('button').addEventListener('click', function () { sfxClick(); buyProduct(pkg.id); });
       list.appendChild(row);
     });
-    $('shopNote').textContent = TEST_MODE
-      ? 'Modo de teste (?teste=1): as moedas são creditadas de graça, sem cobrança.'
-      : 'Pagamentos reais ainda não estão integrados nesta versão: nenhuma cobrança é feita.';
+    // linha de anúncio: moedas grátis (limite diário)
+    var left = coinAdsLeft();
+    var ad = document.createElement('div');
+    ad.className = 'paper-row';
+    ad.innerHTML = '<span class="pr-title"><svg class="ico play-ico"><use href="#i-play"/></svg><span class="pr-stack"><span>+' + CFG.ads.coinReward + ' MOEDAS</span><small>assistindo um anúncio · ' + left + ' hoje</small></span></span>' +
+      '<button class="buy-btn" type="button"' + (left <= 0 || adBusy ? ' disabled' : '') + '>GRÁTIS</button>';
+    ad.querySelector('button').addEventListener('click', function () { sfxClick(); watchAd('coins'); });
+    list.appendChild(ad);
+    $('shopNote').textContent = Platform.mode === 'test'
+      ? 'Modo de teste (?teste=1): compras e anúncios são simulados, sem cobrança.'
+      : (Platform.mode === 'web' ? 'Compras e anúncios funcionam no app Android (Google Play). No navegador nada é cobrado.' : 'Pagamento seguro pela Google Play. As moedas são entregues na hora.');
   }
-  function paymentUnavailable(what) {
+
+  // ---- entrega do que foi comprado (chamada uma única vez por transação) ----
+  Platform.onGrant = function (id) {
+    var p = Platform.product(id);
+    if (!p) return;
+    if (p.kind === 'coins') addCoins(p.amount);
+    else if (p.kind === 'lives') { gainLife(p.amount); renderLives(); }
+    if (currentView === 'lives') renderLivesScreen();
+    if (currentView === 'shop') renderShop();
+  };
+  Platform.onPrices = function () {
+    if (currentView === 'shop') renderShop();
+    if (currentView === 'lives') renderLivesScreen();
+  };
+
+  function purchaseUnavailable() {
     openModal('Compra indisponível',
-      '<p>' + what + ' exige o checkout da loja de aplicativos (App Store / Google Play), que ainda não está integrado.</p><p><b>Nada foi cobrado e nada foi creditado.</b></p>');
+      Platform.mode === 'web'
+        ? '<p>As compras funcionam no <b>app Android</b> (Google Play). No navegador nada é cobrado.</p>'
+        : '<p>A loja ainda não respondeu. Verifique a internet e tente de novo em instantes.</p><p><b>Nada foi cobrado.</b></p>');
   }
-  function buyCoins(pkg) {
-    if (!TEST_MODE) { paymentUnavailable('Comprar ' + pkg.amount + ' moedas'); return; }
-    addCoins(pkg.amount); sfxWin(); showToast('+' + pkg.amount + ' moedas (modo de teste)');
+  function buyProduct(id) {
+    if (purchasing) return;
+    var p = Platform.product(id);
+    purchasing = true;
+    Platform.purchase(id).then(function (res) {
+      purchasing = false;
+      if (res.ok) { sfxWin(); showToast(p.kind === 'coins' ? '+' + p.amount.toLocaleString('pt-BR') + ' moedas! Obrigado!' : '+' + p.amount + (p.amount === 1 ? ' vida!' : ' vidas!')); }
+      else if (res.unavailable) purchaseUnavailable();
+      else if (!res.cancelled) openModal('Não foi possível comprar', '<p>' + (res.error || 'Tente novamente.') + '</p><p><b>Se algo foi cobrado e o item não chegou, ele será entregue automaticamente ao reabrir o jogo.</b></p>');
+    });
+  }
+
+  // ---- anúncios premiados ----
+  var ADCOINS_KEY = 'tubo-certo-adcoins';
+  function coinAdsLeft() {
+    var d = store(ADCOINS_KEY, { date: '', count: 0 });
+    return d.date === dateKey(new Date()) ? Math.max(0, CFG.ads.coinAdsPerDay - d.count) : CFG.ads.coinAdsPerDay;
+  }
+  function useCoinAd() {
+    var today = dateKey(new Date()), d = store(ADCOINS_KEY, { date: '', count: 0 });
+    if (d.date !== today) d = { date: today, count: 0 };
+    d.count++; save(ADCOINS_KEY, d);
+  }
+  function adsUnavailable() {
+    openModal('Anúncio indisponível',
+      Platform.mode === 'web' ? '<p>Os anúncios funcionam no <b>app Android</b>.</p>' : '<p>Não há anúncio disponível agora. Tente de novo em alguns instantes.</p>');
+  }
+  // kind: 'life' | 'coins'; devolve Promise<boolean> (true = recompensa entregue)
+  function watchAd(kind) {
+    if (adBusy) return Promise.resolve(false);
+    if (kind === 'life') { syncLives(); if (state.lives >= MAX_LIVES) { showToast('Suas vidas já estão cheias.'); return Promise.resolve(false); } }
+    if (kind === 'double' && !state.lastReward) return Promise.resolve(false);
+    if (kind === 'coins' && coinAdsLeft() <= 0) { showToast('Limite de anúncios por hoje atingido. Volte amanhã!'); return Promise.resolve(false); }
+    if (!Platform.canShowAds()) { adsUnavailable(); return Promise.resolve(false); }
+    adBusy = true; stopMusic();
+    return Platform.showRewarded().then(function (ok) {
+      adBusy = false; startMusic();
+      if (!ok) { showToast('Anúncio não concluído: sem recompensa.'); }
+      else if (kind === 'double') { var extra = state.lastReward || 0; addCoins(extra); sfxWin(); $('doubleBtn').hidden = true; state.lastReward = 0; $('rewardLine').querySelector('.reward-amount-num').textContent = '+' + (extra * 2); showToast('Prêmio dobrado! +' + extra); }
+      else if (kind === 'life') { gainLife(CFG.ads.lifeReward); renderLives(); sfxWin(); showToast('+' + CFG.ads.lifeReward + ' vida!'); }
+      else { useCoinAd(); addCoins(CFG.ads.coinReward); sfxWin(); showToast('+' + CFG.ads.coinReward + ' moedas!'); }
+      if (currentView === 'lives') renderLivesScreen();
+      if (currentView === 'shop') renderShop();
+      if (ok && !$('view-fail').hidden && state.gate === 'nolives' && state.lives > 0) { state.gate = null; $('view-fail').hidden = true; render(); }
+      return ok;
+    });
   }
 
   // ===================== Reforços =====================
@@ -730,6 +802,7 @@
     $('rewardLine').innerHTML = '<img class="chest" src="' + charUrl('bau') + '" alt=""><span class="reward-hint">Abra o baú</span>';
     $('winMainLabel').textContent = 'ABRIR BAÚ';
     $('winMainBtn').dataset.step = 'chest';
+    $('doubleBtn').hidden = true; state.lastReward = 0;
     $('view-win').classList.remove('shake');
     $('view-win').hidden = false;
     if (!reducedMotion()) launchConfetti();
@@ -746,6 +819,8 @@
     $('rewardTag').className = 'reward-tag' + (reward.jackpot ? ' jackpot' : '');
     $('rewardLine').innerHTML = ico('coin') + '<span class="reward-amount-num">+' + reward.amount + '</span>';
     $('winMainBtn').dataset.step = 'next';
+    state.lastReward = reward.amount;
+    $('doubleBtn').hidden = !(CFG.ads.doubleChest && Platform.canShowAds());
     $('winMainLabel').textContent = state.level >= TOTAL_LEVELS ? 'VOLTAR ÀS FASES' : 'PRÓXIMO NÍVEL';
     sfxWin();
     if (reward.jackpot && !reducedMotion()) {
@@ -806,7 +881,6 @@
   on('playBtn', function () { showView('levels'); });
   on('homeSettingsBtn', function () { openSecondary('settings'); });
   on('homeShopBtn', function () { openSecondary('shop'); });
-  on('homeRankingBtn', function () { openSecondary('ranking'); });
   on('levelsBackBtn', function () { showView('home'); });
   on('levelsCoinBtn', function () { openSecondary('shop'); });
   on('gameBackBtn', function () { showView('levels'); });
@@ -826,14 +900,9 @@
   on('powerupsHintBtn', function () { if (doHint()) showView('game'); });
   on('powerupsExtraBtn', function () { if (doExtraTube()) showView('game'); });
 
-  on('livesBuyOneBtn', function () {
-    if (!TEST_MODE) { paymentUnavailable('Comprar +1 vida'); return; }
-    gainLife(1); renderLivesScreen(); showToast('+1 vida (modo de teste)');
-  });
-  on('livesBuyFiveBtn', function () {
-    if (!TEST_MODE) { paymentUnavailable('Comprar +5 vidas'); return; }
-    gainLife(5); renderLivesScreen(); showToast('+5 vidas (modo de teste)');
-  });
+  on('livesBuyOneBtn', function () { buyProduct('vida_1'); });
+  on('livesBuyFiveBtn', function () { buyProduct('vidas_5'); });
+  on('livesAdBtn', function () { watchAd('life'); });
   on('livesCoinBuyBtn', function () {
     syncLives();
     if (state.lives >= MAX_LIVES) { showToast('Suas vidas já estão cheias.'); return; }
@@ -857,8 +926,15 @@
   });
   on('settingPrivacyRow', function () {
     openModal('Privacidade',
-      '<p>O Tubo Certo não coleta dados pessoais, não usa contas e não envia nada para servidores.</p>' +
-      '<p>Moedas, vidas, estrelas e preferências ficam apenas no armazenamento local deste aparelho (localStorage) e podem ser apagadas em <b>Apagar progresso</b>.</p>');
+      '<p>O Tubo Certo não pede cadastro. Seu progresso (moedas, vidas, estrelas) fica só neste aparelho.</p>' +
+      '<p>Os <b>anúncios</b> são exibidos pelo Google AdMob, que pode usar o identificador de publicidade do aparelho. As <b>compras</b> são processadas pela Google Play.</p>' +
+      '<p>Leia a política completa:</p>', [
+        { label: 'ABRIR POLÍTICA', onClick: function () { window.open(CFG.privacyUrl, '_blank'); } },
+        { label: 'FECHAR', cls: 'alt' }
+      ]);
+  });
+  on('settingAdsRow', function () {
+    Platform.privacyOptions().then(function (ok) { if (!ok) showToast('Nenhuma opção de privacidade disponível para a sua região.'); });
   });
   on('settingResetRow', function () {
     openModal('Apagar progresso?', '<p>Isso zera moedas, vidas, estrelas e recordes deste aparelho. Não dá para desfazer.</p>', [
@@ -879,6 +955,7 @@
     sfxClick();
     if ($('winMainBtn').dataset.step === 'chest') openChest(); else nextLevel();
   });
+  on('doubleBtn', function () { watchAd('double'); });
   on('winHomeBtn', function () { showView('home'); });
   on('winRetryBtn', function () { claimChest(); restart(); });
   on('winShareBtn', function () {
@@ -902,6 +979,7 @@
     ['azul-andando', 'vermelho-andando', 'azul-vitoria', 'vermelho-vitoria', 'vermelho-derrota', 'estrela', 'bau'].forEach(function (n) { new Image().src = charUrl(n); });
     [ART.tubo, ART.selecionado, ART.valido, ART.completo].concat(COLOR_NAMES.map(pieceUrl)).forEach(function (u) { new Image().src = u; });
     state.coins = loadCoins();
+    Platform.init().then(function () { if (currentView === 'shop') renderShop(); if (currentView === 'lives') renderLivesScreen(); });
     syncLives();
     renderLives();
     syncCoinDisplays();

@@ -48,7 +48,7 @@ No puzzle: seta = voltar às fases, raio = tela de reforços, cartão de moedas 
 
 ## Regras e economia
 
-- Fases 1–30; cores = fase + 2 (máx. 10). Toda fase é verificada como solúvel pelo solver.
+- Fases 1–30, em ciclos de 5: 3 fáceis, 1 média, 1 difícil (a difícil usa 1 tubo vazio quando possível). Toda fase é verificada como solúvel pelo solver (teste: `node tests/levels.js`).
 - Meta = ótimo + 2 (3 estrelas). Passou do limite de movimentos → perde 1 vida.
 - Reiniciar volta **ao mesmo tabuleiro** e não gasta vida.
 - Vidas: máx. 5, 1 volta a cada 15 min. Também dá para trocar 80 moedas por 1 vida.
