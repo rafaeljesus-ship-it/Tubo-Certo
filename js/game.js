@@ -744,7 +744,7 @@
     addCoins(reward.amount);
     $('rewardTag').textContent = reward.tag;
     $('rewardTag').className = 'reward-tag' + (reward.jackpot ? ' jackpot' : '');
-    $('rewardLine').innerHTML = ico('coin') + '<span>' + reward.amount + '</span>';
+    $('rewardLine').innerHTML = ico('coin') + '<span class="reward-amount-num">+' + reward.amount + '</span>';
     $('winMainBtn').dataset.step = 'next';
     $('winMainLabel').textContent = state.level >= TOTAL_LEVELS ? 'VOLTAR ÀS FASES' : 'PRÓXIMO NÍVEL';
     sfxWin();

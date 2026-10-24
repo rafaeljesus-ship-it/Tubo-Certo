@@ -760,3 +760,19 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 #winHomeBtn { background-image: url('../assets/personagens/botao-inicio.png') !important; }
 #winRetryBtn { background-image: url('../assets/personagens/botao-reiniciar.png') !important; }
 #winShareBtn { background-image: url('../assets/personagens/botao-compartilhar.png') !important; }
+
+/* painel de recompensa com a moldura gerada por IA: ícone (baú ou moeda) à esquerda, textos à direita */
+.reward-box {
+  width: 84cqw !important; aspect-ratio: 900 / 285; padding: 0 !important; text-align: left !important;
+  background: url('../assets/personagens/painel-recompensa.png') center / 100% 100% no-repeat !important;
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important; filter: drop-shadow(0 .8cqw 0 rgba(27, 17, 9, .3));
+  display: grid !important; grid-template-columns: 31% 1fr; grid-template-rows: 1fr 1fr; grid-template-areas: "icon tag" "icon text";
+  align-items: center; column-gap: 1cqw; padding: 2.6cqw 6cqw 3cqw 5.5cqw !important;
+}
+.reward-line { display: contents !important; }
+.reward-box .reward-tag { grid-area: tag; align-self: end; margin: 0; font: 400 6.9cqw/1 var(--display); letter-spacing: .01em; color: #ffb61c; -webkit-text-stroke: .9cqw var(--ink); paint-order: stroke fill; text-shadow: 0 .6cqw 0 rgba(27, 17, 9, .35); white-space: nowrap; }
+.reward-box .reward-tag.jackpot { color: #ff5a3c; }
+.reward-box .reward-line > :not(img):not(svg) { grid-area: text; align-self: start; font: 400 7.6cqw/1 var(--display); color: #fff; -webkit-text-stroke: .9cqw var(--ink); paint-order: stroke fill; text-shadow: 0 .6cqw 0 rgba(27, 17, 9, .35); white-space: nowrap; }
+.reward-box .reward-line > img.chest { grid-area: icon; justify-self: center; align-self: center; width: 100% !important; max-height: 100%; object-fit: contain; filter: drop-shadow(0 .8cqw 0 rgba(27, 17, 9, .3)); }
+.reward-box .reward-line > svg.ico { grid-area: icon; justify-self: center; align-self: center; width: 78% !important; height: auto !important; aspect-ratio: 1; }
+.reward-box .reward-line > span.reward-amount-num { font-size: 11cqw; }
