@@ -578,3 +578,51 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
   .tube, .tube .st-sel, .tube .st-valid, .tube .st-done { transition: none !important; }
 }
 
+
+/* ===== Tubo Certo: acabamento fiel ao mockup profissional ===== */
+.play-area {
+  padding: 1.8cqw 2.2cqw 1.2cqw !important;
+}
+.board {
+  background:
+    radial-gradient(ellipse at 20% 12%, rgba(255,255,255,.42), transparent 48%),
+    radial-gradient(ellipse at 85% 88%, rgba(209,163,82,.13), transparent 50%),
+    var(--paper),
+    linear-gradient(180deg, #fff5d8 0%, #f4e1b3 100%) !important;
+  border: 2px solid #21170f !important;
+  border-radius: clamp(18px, 4cqw, 30px) !important;
+  box-shadow: 0 3px 0 rgba(27,17,9,.28), inset 0 0 0 2px rgba(255,249,226,.7) !important;
+}
+.board-rows { gap: var(--rowgap, 12px) !important; }
+.tube-row { gap: var(--tgap, 6px) !important; }
+.tube {
+  filter: drop-shadow(0 2px 1px rgba(30,20,10,.16));
+}
+.tube .glass-layer {
+  filter: saturate(.96) contrast(.98);
+}
+.layers {
+  left: 18.5% !important;
+  right: 18.5% !important;
+  top: 11.4% !important;
+  bottom: 9.6% !important;
+  gap: 1.1% !important;
+}
+.seg {
+  height: calc((100% - 3.3%) / 4) !important;
+  overflow: visible;
+  filter: drop-shadow(0 1px .3px rgba(25,17,10,.14));
+}
+.seg.just-dropped { animation: segDrop .28s cubic-bezier(.2,.8,.3,1.2); }
+.tube.selected { transform: translateY(-3.2%) scale(1.015); }
+.tube.selected .glass-layer { filter: drop-shadow(0 0 2px rgba(255,198,46,.6)); }
+.board-hint {
+  border-width: 2px !important;
+  box-shadow: 0 2px 0 rgba(27,17,9,.16);
+  padding: 1cqw 2.8cqw !important;
+}
+.game-controls { padding-top: 1.8cqw !important; gap: 4cqw !important; }
+@media (max-height: 720px) {
+  .play-area { padding-top: 1cqw !important; padding-bottom: .6cqw !important; }
+  .game-controls { padding-top: 1cqw !important; }
+}
