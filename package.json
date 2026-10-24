@@ -1,0 +1,23 @@
+{
+  "name": "tubo-certo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tubo Certo — puzzle de separar cores em tubos (web + app Android via Capacitor)",
+  "scripts": {
+    "build:bridge": "node native/build-bridge.mjs",
+    "build:app": "npm run build:bridge && python3 tools/build-app.py",
+    "sync": "npm run build:app && npx cap sync android",
+    "open:android": "npx cap open android",
+    "test:e2e": "node tests/e2e.js"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "^8.2.1",
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "capacitor-plugin-cdv-purchase": "^13.19.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
+    "esbuild": "^0.25.0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "appId": "br.com.tubocerto.jogo",
+  "appName": "Tubo Certo",
+  "webDir": "app-www",
+  "android": { "allowMixedContent": false },
+  "server": { "androidScheme": "https" }
+}

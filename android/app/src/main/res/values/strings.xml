@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Tubo Certo</string>
+    <string name="title_activity_main">Tubo Certo</string>
+    <string name="package_name">br.com.tubocerto.jogo</string>
+    <string name="custom_url_scheme">br.com.tubocerto.jogo</string>
+    <!-- TROCAR: ID do app no AdMob (formato ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY). Este é o ID de TESTE do Google. -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
+</resources>

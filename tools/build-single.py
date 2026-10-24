@@ -7,7 +7,7 @@ css = open('css/style.css').read()
 for f, m in [('fonts/LilitaOne-400.ttf', 'font/ttf'), ('fonts/Nunito-700.ttf', 'font/ttf'), ('fonts/Nunito-800.ttf', 'font/ttf'),
              ('fonts/Nunito-900.ttf', 'font/ttf'), ('assets/cenario-oficina.jpg', 'image/jpeg')]:
     css = css.replace('../' + f, b64(f, m))
-js = open('js/engine.js').read() + '\n' + open('js/game.js').read()
+js = '\n'.join(open('js/' + f).read() for f in ('config.js', 'platform.js', 'engine.js', 'game.js'))
 # arte do jogo (assets/jogo/*): troca cada caminho por data URI
 art = {}
 for f in sorted(os.listdir('assets/jogo')):
@@ -28,7 +28,7 @@ for _f in os.listdir('assets/personagens'):
 css = css.replace("url('../assets/jogo/prateleira.png')", "url('" + art['prateleira.png'] + "')")
 html = open('index.html').read()
 html = re.sub(r'<link rel="stylesheet" href="css/style.css[^"]*">', lambda m: '<style>\n' + css + '\n</style>', html)
-html = re.sub(r'<script src="js/engine.js[^"]*"></script>\s*<script src="js/game.js[^"]*"></script>', lambda m: '<script>\n' + js + '\n</script>', html)
+html = re.sub(r'<script src="js/config.js[^"]*"></script>\s*<script src="js/platform.js[^"]*"></script>\s*<script src="js/engine.js[^"]*"></script>\s*<script src="js/game.js[^"]*"></script>', lambda m: '<script>\n' + js + '\n</script>', html)
 html = html.replace('assets/cenario-oficina.jpg', b64('assets/cenario-oficina.jpg', 'image/jpeg'))
 for d in ('assets/mascotes', 'assets/personagens'):
     for f in os.listdir(d):

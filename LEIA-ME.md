@@ -32,6 +32,11 @@ Sem esse parâmetro, as compras em dinheiro mostram um aviso de "pagamento indis
 | `referencias/` | Mockup e as 10 telas de referência |
 | `codigo/` | Backups do código anterior (`backup-pre-kit/` = arquivos antes da reformulação do gameplay) |
 | `tests/e2e.js` | Teste ponta a ponta com Playwright |
+| `js/config.js`, `js/platform.js` | IDs de produtos/anúncios e a camada de compras/anúncios (modos nativo, teste e web) |
+| `native/`, `js/native-bridge.js` | Ponte para os plugins nativos do Capacitor (gerada com `npm run build:bridge`) |
+| `android/`, `capacitor.config.json` | Projeto Android (abra com `npm run open:android`) |
+| `loja/` | Ícone, imagem de destaque, prints e guia de publicação |
+| `privacidade.html` | Política de privacidade (preencher os campos amarelos) |
 | `tools/build-single.py` | Gera `dist/tubo-certo.html` (jogo em arquivo único) |
 
 ## Telas
@@ -60,9 +65,10 @@ NODE_PATH=$(npm root -g) node tests/e2e.js /pasta/das/capturas
 
 ## Limitações conhecidas
 
-- **Sem pagamento real**: compras em R$ precisam de integração com App Store / Google Play Billing.
-- **Sem anúncios**: o botão "assistir anúncio" do protótipo foi removido (era simulado).
-- **Ranking é demonstração local** (sem servidor); só a pontuação do jogador é real.
+- **Compras e anúncios**: implementados para o app Android (Google Play Billing + AdMob premiado) em `js/platform.js`, mas **ainda não testados em aparelho real nem contra a Play/AdMob**. No navegador ficam indisponíveis (nada é cobrado).
+- **Sem validação de recibo em servidor**: a entrega é feita no aparelho.
+- **Ranking removido do menu** (precisa de servidor); o código da tela continua no projeto.
+- Guia completo para publicar: `loja/GUIA_PUBLICACAO.md`.
 - Mascotes foram recortados do mockup por IA (resolução ~640 px de altura); podem ter pequenas imperfeições de borda.
 - Música de fundo é procedural (WebAudio), simples; o navegador só libera áudio após o primeiro toque.
 

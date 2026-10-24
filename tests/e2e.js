@@ -46,10 +46,12 @@ async function coins(p) { return +(await p.textContent('#view-home [data-coins],
   await p.locator('#shopList .buy-btn').nth(1).click();
   const after = +(await p.textContent('#view-shop [data-coins]'));
   ok(after === before + 500, `loja (modo de teste) credita 500 moedas (${before} → ${after})`);
+  ok((await p.locator('#shopList .shop-row').count()) === 4, 'loja lista 4 pacotes de moedas');
+  const cAd = +(await p.textContent('#view-shop [data-coins]'));
+  await p.locator('#shopList .paper-row .buy-btn').click(); await p.waitForTimeout(2000);
+  ok(+(await p.textContent('#view-shop [data-coins]')) === cAd + 25, 'anúncio premiado (simulado) dá +25 moedas');
   await p.click('#shopBackBtn');
-  await p.click('#homeRankingBtn'); ok(await p.isVisible('#view-ranking'), 'home → ranking'); await shot('10_ranking');
-  await p.click('#rankTabFriends'); ok((await p.locator('#rankList .rank-row').count()) === 4, 'aba Amigos lista 3 amigos + você');
-  await p.click('#rankingBackBtn');
+  ok((await p.locator('#homeRankingBtn').count()) === 0, 'ranking fora do menu inicial (sem servidor nesta versão)');
   await p.click('#playBtn'); ok(await p.isVisible('#view-levels'), 'home → fases'); await shot('02_fases');
   ok((await p.locator('.level-tile:not(.locked)').count()) === 1, 'só a fase 1 está liberada');
   await p.locator('#levelDots button').nth(1).click(); ok((await p.locator('.level-tile').first().textContent()).includes('13'), 'paginação: página 2 começa na fase 13');
@@ -167,7 +169,7 @@ async function coins(p) { return +(await p.textContent('#view-home [data-coins],
     const cut = await p.evaluate(() => { const b = document.getElementById('boardWrap').getBoundingClientRect(); return [...document.querySelectorAll('#board .tube')].some(t => { const r = t.getBoundingClientRect(); return r.left < b.left || r.right > b.right || r.top < b.top; }); });
     ok(!cut, `${name}: tubos dentro do tabuleiro`);
     await p.click('#gameBackBtn'); await p.click('#levelsBackBtn');
-    for (const [b, v] of [['#homeShopBtn', 'shop'], ['#homeRankingBtn', 'ranking'], ['#homeSettingsBtn', 'settings']]) {
+    for (const [b, v] of [['#homeShopBtn', 'shop'], ['#homeSettingsBtn', 'settings']]) {
       await p.click(b); await shot(`r_${name}_${v}`);
       const clipped = await p.evaluate(v => { const s = document.querySelector('#view-' + v + ' .scroll'); return s.scrollHeight > s.clientHeight + 2; }, v);
       if (clipped) console.log(`  info ${name}/${v}: conteúdo rola dentro da tela (ok, nada cortado)`);
