@@ -208,83 +208,68 @@ button.coin-pill { cursor: pointer; }
 .dots button { width: 3.4cqw; height: 3.4cqw; padding: 0; border: 0; border-radius: 50%; background: #f1e8d2; opacity: .85; }
 .dots button.active { background: var(--yellow); box-shadow: 0 0 0 1.5px var(--ink); }
 
-/* ---------- 3. puzzle ---------- */
-#view-game { padding-bottom: max(2.5cqw, env(safe-area-inset-bottom)); }
-.game-top { position: relative; z-index: 2; display: grid; grid-template-columns: auto 1fr 1.3fr 1.6fr; gap: 2cqw; align-items: stretch; padding: 3.5cqw 3cqw 0; }
-.game-nav { display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 1.5cqw; }
-.hud-card, .hud-wallet { border: 3.5px solid var(--ink); border-radius: 3.2cqw; box-shadow: 0 3px 0 var(--ink), inset 0 2px 0 rgba(255,255,255,.28); }
-.hud-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.4cqw .8cqw; min-width: 0; background: linear-gradient(180deg, #3a79d8, var(--blue-dark)); color: #fff; }
-.hud-label { font: 400 2.9cqw/1 var(--display); letter-spacing: .04em; color: #cfe3ff; white-space: nowrap; }
-.hud-value { font: 400 10.5cqw/1 var(--display); -webkit-text-stroke: .03em var(--ink); paint-order: stroke fill; text-shadow: 0 .6cqw 0 rgba(0,0,0,.35); font-variant-numeric: tabular-nums; }
-.hud-wallet { display: flex; flex-direction: column; justify-content: center; gap: 1.2cqw; padding: 1.6cqw 1.8cqw; background: linear-gradient(180deg, #3a2412, #1b1109); min-width: 0; }
-.wallet-coins { display: flex; align-items: center; justify-content: space-between; gap: 1cqw; padding: 0; background: none; border: 0; color: #fff; font: 400 5.4cqw/1 var(--display); }
+/* ---------- 3. puzzle: mesma linguagem da tela inicial (contorno 3-4px, cantos 3-5cqw, sombra única) ---------- */
+#view-game { padding-bottom: max(2cqw, env(safe-area-inset-bottom)); }
+#view-game .scene { filter: blur(2.5px) saturate(.7) brightness(.6); transform: scale(1.04); }
+#view-game .scene-shade { background: linear-gradient(180deg, rgba(20, 12, 6, .5), rgba(20, 12, 6, .3) 40%, rgba(20, 12, 6, .55)); }
+
+.hud { position: relative; z-index: 2; display: grid; grid-template-columns: auto 1fr 1.3fr 1.55fr; gap: 1.8cqw; align-items: stretch; padding: max(2.6cqw, env(safe-area-inset-top)) 3cqw 0; }
+.hud-nav { display: flex; flex-direction: column; justify-content: space-between; gap: 1.2cqw; }
+.hud-card, .hud-wallet { border: 3px solid var(--ink); border-radius: 3.2cqw; box-shadow: 0 3px 0 var(--ink), inset 0 2px 0 rgba(255, 255, 255, .25); min-width: 0; }
+.hud-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1cqw .6cqw .8cqw; color: #fff; background: linear-gradient(180deg, #3b7ad8, var(--blue-dark)); }
+.hud-label { font: 400 2.7cqw/1 var(--display); letter-spacing: .05em; color: #cfe3ff; white-space: nowrap; }
+.hud-value { font: 400 8.6cqw/1 var(--display); -webkit-text-stroke: .03em var(--ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
+.hud-wallet { display: flex; flex-direction: column; justify-content: center; gap: .8cqw; padding: 1.2cqw 1.8cqw; background: linear-gradient(180deg, #3a2412, #1b1109); }
+.wallet-coins { display: flex; align-items: center; gap: 1.2cqw; padding: 0; background: none; border: 0; color: #fff; font: 400 5cqw/1 var(--display); }
+.wallet-coins .ico.coin { width: 6.2cqw; height: 6.2cqw; }
 .wallet-coins b { flex: 1; text-align: left; font-weight: 400; font-variant-numeric: tabular-nums; }
-.wallet-lives { display: flex; justify-content: space-between; gap: 2px; width: 100%; padding: 0; background: none; border: 0; }
-.wallet-lives .heart { flex: 1 1 0; min-width: 0; width: auto; height: auto; aspect-ratio: 1; max-width: 5.2cqw; }
-.heart { width: 4.8cqw; height: 4.8cqw; stroke: var(--ink); stroke-width: 2.4px; stroke-linejoin: round; paint-order: stroke; }
+.wallet-coins .plus { display: grid; place-items: center; width: 5.4cqw; height: 5.4cqw; border-radius: 50%; background: var(--green); border: 2px solid var(--ink); color: #fff; font-style: normal; }
+.wallet-coins .plus .ico { width: 62%; height: 62%; }
+.heart { stroke: var(--ink); stroke-width: 2.4px; stroke-linejoin: round; paint-order: stroke; }
 .heart.full { color: #ff3b2a; }
 .heart.empty { color: #5d4d3b; }
+.wallet-lives { display: flex; justify-content: space-between; gap: 2px; width: 100%; padding: 0; background: none; border: 0; }
+.wallet-lives .heart { flex: 1 1 0; min-width: 0; width: auto; height: auto; aspect-ratio: 1; max-width: 5cqw; stroke-width: 2px; }
 
-.meta-row { position: relative; z-index: 2; display: flex; align-items: center; gap: 2cqw; padding: 2.2cqw 4cqw 0; }
-.meta-track { position: relative; flex: 1; height: 3.4cqw; background: rgba(27, 17, 9, .6); border: 2.5px solid var(--ink); border-radius: 999px; overflow: hidden; }
+.meta-row { position: relative; z-index: 2; display: flex; align-items: center; gap: 2.4cqw; padding: 2.2cqw 4cqw 0; }
+.meta-track { position: relative; flex: 1; height: 2.6cqw; background: rgba(0, 0, 0, .45); border: 2px solid rgba(255, 238, 190, .6); border-radius: 999px; overflow: hidden; }
 .meta-fill { height: 100%; width: 0; background: linear-gradient(180deg, #7fe08f, var(--green)); transition: width .25s ease, background .25s; }
 .meta-fill.warn { background: linear-gradient(180deg, #ffd94f, var(--yellow)); }
 .meta-fill.over { background: linear-gradient(180deg, #ff7a5f, var(--red)); }
-.meta-mark { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; opacity: .85; }
-.meta-text { font: 800 3.3cqw/1 var(--body); color: #fff; text-shadow: 0 1.5px 0 var(--ink), 1px 0 0 var(--ink), -1px 0 0 var(--ink), 0 -1px 0 var(--ink); white-space: nowrap; }
+.meta-mark { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; opacity: .9; }
+.meta-text { flex: none; font: 800 2.9cqw/1.1 var(--body); color: #ffe7a8; white-space: nowrap; }
 
-.board {
-  position: relative; z-index: 1; flex: 1; min-height: 0; margin: 2.6cqw 3cqw 0;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  background: var(--paper), linear-gradient(180deg, #fbf0d2, #f3e0b0);
-  border: 4px solid var(--ink); border-radius: 5cqw; overflow: hidden;
-  box-shadow: 0 4px 0 var(--ink), inset 0 0 0 3px rgba(255, 255, 255, .35);
-}
-.board::before { content: ''; position: absolute; inset: 0; background: var(--halftone); opacity: .35; mask-image: linear-gradient(180deg, #000, transparent 45%); -webkit-mask-image: linear-gradient(180deg, #000, transparent 45%); pointer-events: none; }
-.board-hint { position: absolute; top: 4cqw; left: 0; right: 0; margin: 0; padding: 0 8cqw; text-align: center; font: 800 3.5cqw/1.25 var(--body); color: #7a6240; transition: opacity .3s; pointer-events: none; }
+/* área de jogo: painel creme leve, sem prateleiras, sem moldura pesada */
+.play-area { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 3.4cqw 3cqw 2cqw; }
+.board { position: relative; display: flex; flex-direction: column; align-items: center; padding: var(--padY, 12px) var(--pad, 12px); background: var(--paper), linear-gradient(180deg, rgba(252, 243, 220, .96), rgba(244, 226, 183, .96)); border: 3px solid var(--ink); border-radius: 5cqw; box-shadow: 0 3px 0 rgba(0, 0, 0, .4); }
+.board-hint { position: absolute; z-index: 6; bottom: -3.4cqw; left: 50%; transform: translateX(-50%); margin: 0; padding: 1cqw 3.2cqw; white-space: nowrap; font: 800 3.1cqw/1 var(--body); color: var(--ink); background: #ffe7a8; border: 2.5px solid var(--ink); border-radius: 999px; transition: opacity .3s; pointer-events: none; }
 .board-hint.gone { opacity: 0; }
-.board-rows { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: var(--rowgap, 14px); padding: 0 0 7cqh; }
-.tube-row { position: relative; display: flex; justify-content: center; align-items: flex-end; gap: var(--tgap, 10px); padding-top: 16px; }
-.tube-row::after { /* prateleira de madeira */
-  content: ''; position: absolute; left: 0; right: 0; bottom: -8px; height: 17px; z-index: 0;
-  background: repeating-linear-gradient(90deg, rgba(0,0,0,0) 0 38px, rgba(60,28,6,.25) 38px 40px), linear-gradient(180deg, var(--wood), var(--wood-2));
-  border-top: 3.5px solid var(--ink); border-bottom: 3.5px solid var(--ink);
-  box-shadow: 0 5px 0 rgba(27, 17, 9, .35);
-}
-.tube { position: relative; z-index: 1; flex: none; width: var(--tw, 52px); height: calc(var(--slot, 36px) * 4 + 24px); padding: 0; border: 0; background: none; cursor: pointer; transition: transform .18s cubic-bezier(.3, 1.6, .5, 1), filter .15s; }
-.tube:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; border-radius: 12px; }
-.tube::before { /* borda superior (elipse) */
-  content: ''; position: absolute; z-index: 3; left: -5px; right: -5px; top: 0; height: 20px;
-  border: 3.5px solid var(--ink); border-radius: 50%;
-  background: radial-gradient(ellipse at 50% 70%, rgba(40, 30, 20, .22) 0 55%, rgba(255, 255, 255, .8) 56%);
-}
-.glass {
-  position: absolute; left: 0; right: 0; top: 10px; bottom: 0; z-index: 1;
-  display: flex; flex-direction: column-reverse; gap: 2px; padding: 12px 4px 4px;
-  border: 3.5px solid var(--ink); border-top: 0; border-radius: 0 0 calc(var(--tw, 52px) * .5) calc(var(--tw, 52px) * .5);
-  background: linear-gradient(90deg, rgba(255,255,255,.8), rgba(235,246,255,.35) 38%, rgba(255,255,255,.55));
-  box-shadow: inset 0 -4px 0 rgba(27, 17, 9, .1);
-}
-.glass::after { /* brilho do vidro */
-  content: ''; position: absolute; z-index: 4; left: 13%; top: 20px; bottom: 14px; width: 3px; border-radius: 3px; background: rgba(255, 255, 255, .95); pointer-events: none;
-}
-.seg {
-  position: relative; flex: none; height: var(--slot, 36px);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 78%, #fff), var(--c) 40%, color-mix(in srgb, var(--c) 82%, #000));
-  border: 2.5px solid var(--ink); border-radius: 6px;
-}
-.seg:first-child { border-radius: 6px 6px calc(var(--tw, 52px) * .42) calc(var(--tw, 52px) * .42); }
-.seg.just-dropped { animation: segDrop .32s ease; }
-@keyframes segDrop { 0% { transform: translateY(-40%) scaleY(.6); } 60% { transform: translateY(0) scaleY(1.12); } 100% { transform: none; } }
-.tube.selected { transform: translateY(-14px); filter: drop-shadow(0 0 5px #ffe066) drop-shadow(0 3px 0 rgba(27,17,9,.4)); }
-.tube.solved .glass { background: linear-gradient(90deg, rgba(255,246,190,.9), rgba(255,226,120,.5) 40%, rgba(255,246,190,.8)); }
-.tube.solved::before { background: radial-gradient(ellipse at 50% 70%, rgba(40, 30, 20, .2) 0 55%, #fff1a0 56%); }
-.tube.almost::before { animation: rimPulse 1s ease-in-out infinite; }
-@keyframes rimPulse { 50% { box-shadow: 0 0 0 3px rgba(255, 194, 26, .8); } }
-.tube.hint { animation: hintBounce .55s ease-in-out infinite alternate; filter: drop-shadow(0 0 7px var(--red)); }
-@keyframes hintBounce { to { transform: translateY(-9px); } }
+.board-rows { display: flex; flex-direction: column; align-items: center; gap: var(--rowgap, 4px); }
+.tube-row { display: flex; justify-content: center; align-items: flex-end; gap: var(--tgap, 4px); }
 
-.game-controls { position: relative; z-index: 2; display: flex; justify-content: center; gap: 5cqw; padding: 5cqw 4cqw 1cqw; }
+/* tubo = camadas independentes: peças (HTML/SVG) + vidro e estados (SVG do kit adaptado) */
+.tube { position: relative; flex: none; width: var(--tw, 60px); height: calc(var(--tw, 60px) * 2.714); padding: 0; border: 0; background: none; cursor: pointer; transition: transform .16s cubic-bezier(.3, 1.6, .5, 1); }
+.tube:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 12px; }
+.tube > img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.tube .glass-layer { z-index: 3; }
+.tube .st-sel, .tube .st-valid, .tube .st-done { opacity: 0; transition: opacity .15s; z-index: 4; }
+.tube.selected .st-sel, .tube.valid .st-valid, .tube.solved .st-done { opacity: 1; }
+.tube.valid .st-valid { animation: validPulse 1s ease-in-out infinite; }
+@keyframes validPulse { 50% { opacity: .55; } }
+.layers { position: absolute; z-index: 2; left: 21.8%; right: 21.8%; top: 11.6%; bottom: 9.8%; display: flex; flex-direction: column-reverse; gap: .5%; }
+.seg { flex: none; width: 100%; height: calc((100% - 1.5%) / 4); display: block; overflow: visible; }
+.seg.just-dropped { animation: segDrop .3s ease; }
+@keyframes segDrop { 0% { transform: translateY(-30%) scaleY(.7); } 60% { transform: scaleY(1.06); } 100% { transform: none; } }
+.tube.selected { transform: translateY(-4%); }
+.tube.solved { animation: doneGlow 2s ease-in-out infinite; }
+@keyframes doneGlow { 50% { filter: drop-shadow(0 0 5px rgba(255, 200, 40, .8)); } }
+.tube.hint { animation: hintBounce .55s ease-in-out infinite alternate; filter: drop-shadow(0 0 5px var(--red)); }
+@keyframes hintBounce { to { transform: translateY(-4%); } }
+
+/* ferramentas: exatamente os botões redondos da tela inicial */
+.game-controls { position: relative; z-index: 2; display: flex; justify-content: center; gap: 5cqw; padding: 2.6cqw 4cqw 1.4cqw; }
+.game-controls .round-btn { --sz: clamp(48px, 14.4cqw, 68px); }
+.game-controls .badge { top: -7px; right: -7px; }
 
 /* ---------- telas de papel (loja, vidas, reforços, config, ranking) ---------- */
 .paper-screen { background: #2b1a0c url('../assets/cenario-oficina.jpg') center 80% / cover; }
@@ -444,15 +429,14 @@ canvas.confetti { position: absolute; inset: 0; width: 100%; height: 100%; z-ind
 @keyframes glowPulse { 50% { filter: drop-shadow(0 0 14px rgba(255, 214, 64, .95)) drop-shadow(0 .8cqw 0 rgba(27,17,9,.35)); } }
 
 /* varredura de luz nos botões principais e fichas */
-.btn-big, .level-tile:not(.locked), .buy-btn, .hud-card { position: relative; overflow: hidden; }
-.btn-big::before, .buy-btn::before, .level-tile:not(.locked)::before, .hud-card::before {
+.btn-big, .level-tile:not(.locked), .buy-btn { position: relative; overflow: hidden; }
+.btn-big::before, .buy-btn::before, .level-tile:not(.locked)::before {
   content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 38%; pointer-events: none;
   background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .75), transparent);
   transform: translateX(-130%) skewX(-22deg); animation: sheen 3.6s ease-in-out infinite;
 }
 .buy-btn::before { animation-duration: 4.4s; animation-delay: 1s; }
 .level-tile:not(.locked)::before { animation-delay: .6s; animation-duration: 5s; }
-.hud-card::before { animation-duration: 6s; animation-delay: 2s; opacity: .6; }
 .btn-big > *, .buy-btn > * { position: relative; }
 
 /* brilho extra nos botões redondos e ícones */
@@ -466,16 +450,6 @@ canvas.confetti { position: absolute; inset: 0; width: 100%; height: 100%; z-ind
 
 /* mascotes mais vivos */
 .home-mascot, .win-mascots img, .fail-mascot img { filter: saturate(1.12) brightness(1.04) drop-shadow(0 .8cqw 0 rgba(27, 17, 9, .35)) drop-shadow(0 0 10px rgba(255, 255, 255, .25)); }
-
-/* tubos: vidro com reflexos e blocos de cor com brilho de verniz */
-.glass { background: linear-gradient(90deg, rgba(255,255,255,.92), rgba(225,242,255,.38) 34%, rgba(255,255,255,.2) 62%, rgba(255,255,255,.7)); }
-.glass::before { content: ''; position: absolute; z-index: 4; right: 12%; top: 26px; bottom: 30%; width: 2px; border-radius: 2px; background: rgba(255, 255, 255, .8); pointer-events: none; }
-.seg { box-shadow: inset 0 3px 0 rgba(255, 255, 255, .55), inset 0 -4px 0 rgba(0, 0, 0, .16); }
-.seg::before { content: ''; position: absolute; left: 12%; top: 10%; width: 46%; height: 26%; border-radius: 40%; background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.05)); }
-.seg::after { content: ''; position: absolute; right: 12%; top: 14%; width: 9%; height: 9%; border-radius: 50%; background: rgba(255, 255, 255, .9); }
-.tube.selected { filter: drop-shadow(0 0 9px #fff2a0) drop-shadow(0 0 3px #ffd84d) drop-shadow(0 3px 0 rgba(27,17,9,.4)); }
-.tube.solved { filter: drop-shadow(0 0 8px rgba(255, 200, 40, .9)); animation: glowPulse 1.8s ease-in-out infinite; }
-.tube.solved::after { content: ''; position: absolute; z-index: 5; left: 50%; top: -14px; width: 18px; height: 18px; margin-left: -9px; background: #fff7b0; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 1.6s ease-in-out infinite; }
 
 /* faíscas decorativas */
 .sparkles { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
@@ -494,9 +468,8 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 .reward-line .ico.coin { animation: coinSpin 1.6s ease-in-out infinite; }
 @keyframes coinSpin { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.25); } }
 .meta-fill { box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45); }
-.board { box-shadow: 0 4px 0 var(--ink), inset 0 0 0 3px rgba(255, 255, 255, .5), inset 0 14px 28px rgba(255, 255, 255, .45); }
 
 @media (prefers-reduced-motion: reduce) {
   .sparkles i { animation: none !important; opacity: .9; transform: scale(1); }
-  .btn-big::before, .buy-btn::before, .level-tile::before, .hud-card::before { display: none; }
+  .btn-big::before, .buy-btn::before, .level-tile::before { display: none; }
 }

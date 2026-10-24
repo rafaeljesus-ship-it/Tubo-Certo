@@ -30,6 +30,7 @@ Sem esse parâmetro, as compras em dinheiro mostram um aviso de "pagamento indis
 | `referencias/` | Mockup e as 10 telas de referência |
 | `codigo/` | Backups do código anterior (`backup-pre-kit/` = arquivos antes da reformulação do gameplay) |
 | `tests/e2e.js` | Teste ponta a ponta com Playwright |
+| `tools/build-single.py` | Gera `dist/tubo-certo.html` (jogo em arquivo único) |
 
 ## Telas
 

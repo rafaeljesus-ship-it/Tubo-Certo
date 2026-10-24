@@ -589,7 +589,7 @@
         // sobra de altura: reparte um pouco em respiro (entre fileiras e nas bordas), sem inflar o painel
         var used = r * (tw * TUBE_ASPECT + shelf) + (r - 1) * rowGap + 2 * pad + 6;
         var extra = Math.max(0, H - used);
-        best = { r: r, per: per, gap: gap, rowGap: rowGap + (r > 1 ? Math.min(extra * 0.35 / (r - 1), 30) : 0), shelf: shelf, pad: pad, padY: pad + Math.min(extra * 0.15, 22), tw: tw };
+        best = { r: r, per: per, gap: gap, rowGap: rowGap + (r > 1 ? Math.min(extra * 0.18 / (r - 1), 16) : 0), shelf: shelf, pad: pad, padY: pad + Math.min(extra * 0.08, 10), tw: tw };
       }
     }
     return best || { r: 3, per: Math.ceil(n / 3), gap: 4, rowGap: 8, shelf: 6, pad: 8, tw: 24 };
