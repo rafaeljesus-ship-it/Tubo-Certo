@@ -168,6 +168,7 @@ button.coin-pill { cursor: pointer; }
 #view-home .logo { position: relative; margin-top: 1cqh; }
 .home-stage { position: relative; flex: 1; width: 100%; min-height: 0; }
 .home-mascot { position: absolute; bottom: 0; height: 80%; width: auto; filter: drop-shadow(0 .8cqw 0 rgba(27, 17, 9, .35)); transform-origin: 50% 100%; }
+.home-fist { position: absolute; left: 47.5%; bottom: 36%; height: 21%; width: auto; z-index: 2; filter: drop-shadow(0 .6cqw 0 rgba(27,17,9,.35)); animation: stroll 1.5s ease-in-out -.4s infinite; }
 .home-mascot.blue { left: 5%; animation: stroll 1.5s ease-in-out infinite; }
 .home-mascot.red { right: 5%; height: 70%; animation: stroll 1.5s ease-in-out -.75s infinite; }
 @keyframes stroll { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-2.2cqw) rotate(1.5deg); } }
