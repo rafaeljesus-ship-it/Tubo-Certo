@@ -96,7 +96,7 @@ async function coins(p) { return +(await p.textContent('#view-home [data-coins],
   ok(n > 0, `solver resolveu a fase 1 em ${n} movimentos`);
   await p.waitForTimeout(900);
   ok(await p.isVisible('#view-win'), 'tela de vitória aparece'); await shot('04_vitoria');
-  ok((await p.locator('#winStars .ico.on').count()) >= 1, 'ganhou ao menos 1 estrela');
+  ok((await p.locator('#winStars .star-img.on').count()) >= 1, 'ganhou ao menos 1 estrela');
   const cw = +(await p.textContent('#view-game [data-coins]'));
   await p.click('#winMainBtn'); await p.waitForTimeout(200); await shot('04b_bau');
   const cw2 = +(await p.textContent('#view-game [data-coins]'));
