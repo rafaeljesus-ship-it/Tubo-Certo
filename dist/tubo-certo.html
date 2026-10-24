@@ -635,6 +635,67 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
   .game-controls { padding-top: 1cqw !important; }
 }
 
+/* ==========================================================================
+   Tubo Certo — FORMATO DO MOCKUP "EXEMPLOS EM JOGO"
+   Tubo de paredes retas (100×300) com aro metálico, peças quadradas na largura toda,
+   prateleira de madeira sob cada fileira e bancada de madeira com as ferramentas.
+   (Vem por último e usa !important porque substitui blocos de refinamento anteriores.)
+   ========================================================================== */
+.play-area { flex-direction: column !important; justify-content: center !important; align-items: stretch !important; padding: 2.4cqw 3.2cqw 1.6cqw !important; }
+#boardPanel {
+  width: 100%; align-items: center;
+  padding: var(--padY, 30px) var(--pad, 14px) 0 !important;
+  border: 3px solid var(--ink) !important; border-bottom: 0 !important;
+  border-radius: 4.4cqw 4.4cqw 0 0 !important;
+  box-shadow: none !important;
+  background: radial-gradient(ellipse at 18% 8%, rgba(255,255,255,.5), transparent 50%), var(--paper), linear-gradient(180deg, #fff6dc, #f3dfae) !important;
+}
+#boardPanel > .board-hint { position: absolute !important; top: 1.6cqw !important; bottom: auto !important; left: 50% !important; transform: translateX(-50%) !important; margin: 0 !important; white-space: nowrap !important; }
+#boardPanel > .board-hint.gone { display: block !important; opacity: 0; }
+.board-rows { gap: var(--rowgap, 12px) !important; width: 100%; }
+.tube-row { position: relative; gap: var(--tgap, 8px) !important; padding-bottom: var(--shelf, 14px); width: 100%; }
+.tube-row::after { /* prateleira: tampo claro + frente escura + cantoneiras de latão */
+  content: ''; position: absolute; left: calc(-1 * var(--pad, 14px) - 2.6cqw); right: calc(-1 * var(--pad, 14px) - 2.6cqw); bottom: 0; height: var(--shelf, 14px); z-index: 0;
+  background:
+    radial-gradient(circle at 3.2% 62%, #ffe08a 0 2.2px, #8a5a12 2.6px 3.4px, transparent 3.8px),
+    radial-gradient(circle at 96.8% 62%, #ffe08a 0 2.2px, #8a5a12 2.6px 3.4px, transparent 3.8px),
+    linear-gradient(180deg, #f0c27e 0 34%, #c8853f 34% 100%);
+  border: 2.5px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 rgba(27, 17, 9, .35);
+}
+.tube-row:not(:last-child)::after { left: calc(-1 * var(--pad, 14px) + 2px); right: calc(-1 * var(--pad, 14px) + 2px); }
+.tube { width: var(--tw, 60px) !important; height: calc(var(--tw, 60px) * 3) !important; filter: drop-shadow(0 3px 2px rgba(27, 17, 9, .18)) !important; position: relative; z-index: 1; }
+.tube .layers { left: 11.6% !important; right: 11.6% !important; top: 8.2% !important; bottom: 5.6% !important; gap: .9% !important; }
+.tube .seg { height: calc((100% - 2.7%) / 4) !important; }
+.tube.selected { transform: translateY(-5%) !important; }
+
+/* bancada de madeira com as ferramentas (mesmos botões redondos da tela inicial) */
+#gameBench {
+  position: relative; margin: 0 1.2cqw; padding: 3.4cqw 3cqw 3.6cqw !important; gap: 5.6cqw !important; justify-content: center;
+  background: repeating-linear-gradient(90deg, transparent 0 22%, rgba(0, 0, 0, .16) 22% calc(22% + 2px)), linear-gradient(180deg, #8f5728, #6a3c18 70%, #5a3214);
+  border: 3px solid var(--ink); border-top: 0; border-radius: 0 0 4cqw 4cqw;
+  box-shadow: inset 0 6px 6px -4px rgba(0, 0, 0, .45), 0 4px 0 rgba(0, 0, 0, .45);
+}
+#gameBench::before, #gameBench::after { /* canos laterais que sustentam a bancada */
+  content: ''; position: absolute; top: 18%; bottom: -10px; width: 2.6cqw; border: 2.5px solid var(--ink); border-radius: 3px;
+  background: linear-gradient(90deg, #4f6f8f, #9db8d0 40%, #3d5670);
+}
+#gameBench::before { left: -3.4cqw; } #gameBench::after { right: -3.4cqw; }
+#gameBench .round-btn { --sz: clamp(46px, 13.4cqw, 64px) !important; }
+
+/* proporções do mockup: HUD e bancada mais robustos; tabuleiro apoiado embaixo, perto do polegar */
+.play-area { justify-content: center !important; }
+.hud-label { font-size: 3.1cqw !important; }
+.hud-value { font-size: 10cqw !important; }
+.hud-card { padding: 1.4cqw .6cqw 1.2cqw !important; }
+.wallet-coins { font-size: 5.6cqw !important; }
+.wallet-coins .ico.coin { width: 7cqw !important; height: 7cqw !important; }
+.wallet-coins .plus { width: 6cqw !important; height: 6cqw !important; }
+.wallet-lives .heart { max-width: 5.6cqw !important; }
+.hud-wallet { padding: 1.6cqw 2cqw !important; gap: 1.2cqw !important; }
+#gameBench { padding: 4cqw 3cqw 4.4cqw !important; gap: 5cqw !important; }
+#gameBench .round-btn { --sz: clamp(54px, 16.6cqw, 78px) !important; }
+#gameBench .badge { min-width: 24px; height: 24px; font-size: 12px; top: -6px; right: -6px; }
+
 </style>
 </head>
 <body>
@@ -756,13 +817,13 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
         <p class="board-hint" id="boardHint">Toque num tubo e depois em outro</p>
         <div class="board-rows" id="board"></div>
       </div>
-    </main>
-    <footer class="game-controls">
+      <footer class="game-controls bench" id="gameBench">
       <button class="round-btn" id="undoBtn" type="button" aria-label="Desfazer movimento"><svg class="ico"><use href="#i-undo"/></svg><span class="badge" id="undoBadge">0</span></button>
       <button class="round-btn" id="hintBtn" type="button" aria-label="Dica, 50 moedas"><svg class="ico"><use href="#i-bulb"/></svg><span class="badge">50</span></button>
       <button class="round-btn" id="extraTubeBtn" type="button" aria-label="Tubo extra, 100 moedas"><svg class="ico"><use href="#i-plus"/></svg><span class="badge">100</span></button>
       <button class="round-btn" id="restartBtn" type="button" aria-label="Reiniciar fase"><svg class="ico"><use href="#i-restart"/></svg></button>
-    </footer>
+      </footer>
+    </main>
   </section>
 
   <!-- ====================================================== 6. LOJA DE MOEDAS -->
@@ -924,10 +985,10 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 </div>
 
 <script>
-var SVG_G = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMzgwIiB2aWV3Qm94PSIwIDAgMTQwIDM4MCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ2xhc3MiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmYiIHN0b3Atb3BhY2l0eT0iLjUiLz48c3RvcCBvZmZzZXQ9Ii4xNCIgc3RvcC1jb2xvcj0iI2UzZjZmZiIgc3RvcC1vcGFjaXR5PSIuMTQiLz48c3RvcCBvZmZzZXQ9Ii41MiIgc3RvcC1jb2xvcj0iI2ZmZiIgc3RvcC1vcGFjaXR5PSIuMDMiLz48c3RvcCBvZmZzZXQ9Ii44NiIgc3RvcC1jb2xvcj0iI2JmZTlmNyIgc3RvcC1vcGFjaXR5PSIuMTIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZmYiIHN0b3Atb3BhY2l0eT0iLjQ4Ii8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJyaW0iIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmYiLz48c3RvcCBvZmZzZXQ9Ii40NSIgc3RvcC1jb2xvcj0iI2RiZTZlYSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzhmYTBhOCIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNvZnQiIHg9Ii0zMCUiIHk9Ii00MCUiIHdpZHRoPSIxNjAlIiBoZWlnaHQ9IjIwMCUiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjMiLz48L2ZpbHRlcj48L2RlZnM+CjxlbGxpcHNlIGN4PSI3MCIgY3k9IjM2NiIgcng9IjQwIiByeT0iNSIgZmlsbD0iIzAwMCIgb3BhY2l0eT0iLjIiIGZpbHRlcj0idXJsKCNzb2Z0KSIvPgo8cGF0aCBkPSJNMjQgMzQgUTI0IDE4IDQwIDE4IEgxMDAgUTExNiAxOCAxMTYgMzQgVjMwNiBRMTE2IDM0MiA5MSAzNTQgUTcwIDM2NSA0OSAzNTQgUTI0IDM0MiAyNCAzMDYgWiIgZmlsbD0idXJsKCNnbGFzcykiIHN0cm9rZT0iIzE3MTMwZiIgc3Ryb2tlLXdpZHRoPSI0LjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTMxLjUgNDYgVjMwMiBRMzEuNSAzMjggNDkgMzQxIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNC41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii43Ii8+CjxwYXRoIGQ9Ik0xMDggNTggVjI5NiBRMTA4IDMyMCA5NiAzMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzljYzRkNCIgc3Ryb2tlLXdpZHRoPSIyLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iLjU1Ii8+CjxwYXRoIGQ9Ik0zNiAzMTYgUTQwIDM0MCA1NiAzNDggUTcwIDM1NCA4NCAzNDggUTEwMCAzNDAgMTA0IDMxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNCIgb3BhY2l0eT0iLjQiLz4KPGVsbGlwc2UgY3g9IjcwIiBjeT0iMjciIHJ4PSI0OSIgcnk9IjE2LjUiIGZpbGw9InVybCgjcmltKSIgc3Ryb2tlPSIjMTcxMzBmIiBzdHJva2Utd2lkdGg9IjQiLz4KPGVsbGlwc2UgY3g9IjcwIiBjeT0iMjciIHJ4PSIzNy41IiByeT0iMTAuNSIgZmlsbD0iIzNiNGE1MiIgc3Ryb2tlPSIjZjJmYmZmIiBzdHJva2Utd2lkdGg9IjIiLz4KPGVsbGlwc2UgY3g9IjcwIiBjeT0iMjkuNSIgcng9IjMxIiByeT0iNi41IiBmaWxsPSIjMjIyZDMzIi8+CjxwYXRoIGQ9Ik0yNyAyNCBRMzAgMTQgNTAgMTEuNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iLjg1Ii8+PC9zdmc+Cg==';
-var SVG_S = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMzgwIiB2aWV3Qm94PSIwIDAgMTQwIDM4MCI+PGRlZnM+PGZpbHRlciBpZD0iZ2xvdyIgeD0iLTMwJSIgeT0iLTIwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTQwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNC41IiByZXN1bHQ9ImIiLz48ZmVNZXJnZT48ZmVNZXJnZU5vZGUgaW49ImIiLz48ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz48L2ZlTWVyZ2U+PC9maWx0ZXI+PC9kZWZzPgo8cGF0aCBkPSJNMjAgMzQgUTIwIDE0IDQwIDE0IEgxMDAgUTEyMCAxNCAxMjAgMzQgVjMwNiBRMTIwIDM0NSA5MyAzNTkgUTcwIDM3MiA0NyAzNTkgUTIwIDM0NSAyMCAzMDYgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjYTMyIiBzdHJva2Utd2lkdGg9IjUiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNMjQuNSAzNCBRMjQuNSAxOC41IDQxIDE4LjUgSDk5IFExMTUuNSAxOC41IDExNS41IDM0IFYzMDYgUTExNS41IDM0MSA5MSAzNTMuNSBRNzAgMzYzLjUgNDkgMzUzLjUgUTI0LjUgMzQxIDI0LjUgMzA2IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZjRiNSIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+Cg==';
-var SVG_V = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMzgwIiB2aWV3Qm94PSIwIDAgMTQwIDM4MCI+PGRlZnM+PGZpbHRlciBpZD0iZ2xvdyIgeD0iLTMwJSIgeT0iLTIwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTQwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMy41IiByZXN1bHQ9ImIiLz48ZmVNZXJnZT48ZmVNZXJnZU5vZGUgaW49ImIiLz48ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz48L2ZlTWVyZ2U+PC9maWx0ZXI+PC9kZWZzPgo8cGF0aCBkPSJNMjEgMzQgUTIxIDE1IDQwIDE1IEgxMDAgUTExOSAxNSAxMTkgMzQgVjMwNiBRMTE5IDM0NSA5MyAzNTggUTcwIDM3MCA0NyAzNTggUTIxIDM0NSAyMSAzMDYgWiIgZmlsbD0iIzU1ZjA4ZiIgZmlsbC1vcGFjaXR5PSIuMDYiIHN0cm9rZT0iIzRjZjA4YSIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtZGFzaGFycmF5PSIxMCA3IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbHRlcj0idXJsKCNnbG93KSIvPjwvc3ZnPgo=';
-var SVG_C = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMzgwIiB2aWV3Qm94PSIwIDAgMTQwIDM4MCI+PGRlZnM+PGZpbHRlciBpZD0iZ2xvdyIgeD0iLTMwJSIgeT0iLTIwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTQwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjwvZGVmcz4KPHBhdGggZD0iTTIxIDM0IFEyMSAxNSA0MCAxNSBIMTAwIFExMTkgMTUgMTE5IDM0IFYzMDYgUTExOSAzNDUgOTMgMzU4IFE3MCAzNzAgNDcgMzU4IFEyMSAzNDUgMjEgMzA2IFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmYzgzZCIgc3Ryb2tlLXdpZHRoPSI0IiBmaWx0ZXI9InVybCgjZ2xvdykiIG9wYWNpdHk9Ii45NSIvPgo8ZyBmaWxsPSIjZmZmNmI4IiBmaWx0ZXI9InVybCgjZ2xvdykiPjxwYXRoIGQ9Ik0xMiA2MiBsMyA3IDcgMyAtNyAzIC0zIDcgLTMgLTcgLTcgLTMgNyAtM3oiLz48cGF0aCBkPSJNMTI4IDk2IGwyLjUgNiA2IDIuNSAtNiAyLjUgLTIuNSA2IC0yLjUgLTYgLTYgLTIuNSA2IC0yLjV6Ii8+PHBhdGggZD0iTTEyMiAxOCBsMiA1IDUgMiAtNSAyIC0yIDUgLTIgLTUgLTUgLTIgNSAtMnoiLz48L2c+PC9zdmc+Cg==';
+var SVG_G = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMTAwIDMwMCI+PGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ2wiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmYiIHN0b3Atb3BhY2l0eT0iLjU1Ii8+PHN0b3Agb2Zmc2V0PSIuMTQiIHN0b3AtY29sb3I9IiNlYWY3ZmYiIHN0b3Atb3BhY2l0eT0iLjIiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjZmZmIiBzdG9wLW9wYWNpdHk9Ii4xNCIvPjxzdG9wIG9mZnNldD0iLjg2IiBzdG9wLWNvbG9yPSIjY2ZlYWY1IiBzdG9wLW9wYWNpdHk9Ii4xOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZmZiIgc3RvcC1vcGFjaXR5PSIuNSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icmltIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZmRmZWZlIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iI2NmZDlkZSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzdmOGQ5NCIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icmltdG9wIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYjljNWNiIi8+PHN0b3Agb2Zmc2V0PSIuMyIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iLjciIHN0b3AtY29sb3I9IiNlNmVkZjAiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM5YWE4YWYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz4KPHBhdGggZD0iTTggMTQgSDkyIFYyNzAgUTkyIDI5MyA3MCAyOTMgSDMwIFE4IDI5MyA4IDI3MCBaIiBmaWxsPSJ1cmwoI2dsKSIgc3Ryb2tlPSIjMTcxMzBmIiBzdHJva2Utd2lkdGg9IjMuOCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNMTIgMjY4IFExMiAyODggMzEgMjg4IEg2OSBRODggMjg4IDg4IDI2OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNCIgb3BhY2l0eT0iLjU1Ii8+CjxyZWN0IHg9IjEzIiB5PSIyOCIgd2lkdGg9IjUuNSIgaGVpZ2h0PSIyMzIiIHJ4PSIyLjc1IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuNzgiLz4KPHJlY3QgeD0iMjEuNSIgeT0iMzQiIHdpZHRoPSIyLjQiIGhlaWdodD0iMTkwIiByeD0iMS4yIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuNDUiLz4KPHJlY3QgeD0iODEiIHk9IjM2IiB3aWR0aD0iMyIgaGVpZ2h0PSIyMjIiIHJ4PSIxLjUiIGZpbGw9IiNhOWQzZTMiIG9wYWNpdHk9Ii41NSIvPgo8cGF0aCBkPSJNMS41IDExIFYyMCBRNTAgMjkgOTguNSAyMCBWMTEgWiIgZmlsbD0idXJsKCNyaW0pIiBzdHJva2U9IiMxNzEzMGYiIHN0cm9rZS13aWR0aD0iMy40IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxlbGxpcHNlIGN4PSI1MCIgY3k9IjExIiByeD0iNDguNSIgcnk9IjguNSIgZmlsbD0idXJsKCNyaW10b3ApIiBzdHJva2U9IiMxNzEzMGYiIHN0cm9rZS13aWR0aD0iMy40Ii8+CjxlbGxpcHNlIGN4PSI1MCIgY3k9IjExLjUiIHJ4PSIzOCIgcnk9IjUiIGZpbGw9IiMyODMyM2EiLz4KPHBhdGggZD0iTTE0IDkgUTI0IDUuNSA0MCA1IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii45Ii8+PC9zdmc+Cg==';
+var SVG_S = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMTAwIDMwMCI+PGRlZnM+PGZpbHRlciBpZD0iZ2xvdyIgeD0iLTMwJSIgeT0iLTE1JSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTMwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMy41IiByZXN1bHQ9ImIiLz48ZmVNZXJnZT48ZmVNZXJnZU5vZGUgaW49ImIiLz48ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz48L2ZlTWVyZ2U+PC9maWx0ZXI+PC9kZWZzPgo8cGF0aCBkPSJNMy41IDEwIFEzLjUgNSAxMCA1IEg5MCBROTYuNSA1IDk2LjUgMTAgVjI3MCBROTYuNSAyOTcgNzAgMjk3IEgzMCBRMy41IDI5NyAzLjUgMjcwIFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmY2EzMiIgc3Ryb2tlLXdpZHRoPSI0LjUiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNOCAxNCBIOTIgVjI3MCBROTIgMjkzIDcwIDI5MyBIMzAgUTggMjkzIDggMjcwIFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZjRiNSIgc3Ryb2tlLXdpZHRoPSIxLjYiLz48L3N2Zz4K';
+var SVG_V = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMTAwIDMwMCI+PGRlZnM+PGZpbHRlciBpZD0iZ2xvdyIgeD0iLTMwJSIgeT0iLTE1JSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTMwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMyIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjwvZGVmcz4KPHBhdGggZD0iTTMuNSAxMCBRMy41IDUgMTAgNSBIOTAgUTk2LjUgNSA5Ni41IDEwIFYyNzAgUTk2LjUgMjk3IDcwIDI5NyBIMzAgUTMuNSAyOTcgMy41IDI3MCBaIiBmaWxsPSIjNTVmMDhmIiBmaWxsLW9wYWNpdHk9Ii4wNyIgc3Ryb2tlPSIjNGNmMDhhIiBzdHJva2Utd2lkdGg9IjMuNiIgc3Ryb2tlLWRhc2hhcnJheT0iOCA2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbHRlcj0idXJsKCNnbG93KSIvPjwvc3ZnPgo=';
+var SVG_C = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMTAwIDMwMCI+PGRlZnM+PGZpbHRlciBpZD0iZ2xvdyIgeD0iLTQwJSIgeT0iLTE1JSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTMwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMy41IiByZXN1bHQ9ImIiLz48ZmVNZXJnZT48ZmVNZXJnZU5vZGUgaW49ImIiLz48ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz48L2ZlTWVyZ2U+PC9maWx0ZXI+PC9kZWZzPgo8cGF0aCBkPSJNMy41IDEwIFEzLjUgNSAxMCA1IEg5MCBROTYuNSA1IDk2LjUgMTAgVjI3MCBROTYuNSAyOTcgNzAgMjk3IEgzMCBRMy41IDI5NyAzLjUgMjcwIFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmYzgzZCIgc3Ryb2tlLXdpZHRoPSIzLjYiIGZpbHRlcj0idXJsKCNnbG93KSIgb3BhY2l0eT0iLjk1Ii8+CjxnIGZpbGw9IiNmZmY2YjgiIGZpbHRlcj0idXJsKCNnbG93KSI+PHBhdGggZD0iTTQgNTAgbDIuNSA2IDYgMi41IC02IDIuNSAtMi41IDYgLTIuNSAtNiAtNiAtMi41IDYgLTIuNXoiLz48cGF0aCBkPSJNOTYgOTIgbDIgNSA1IDIgLTUgMiAtMiA1IC0yIC01IC01IC0yIDUgLTJ6Ii8+PHBhdGggZD0iTTg4IC0yIGwyIDUgNSAyIC01IDIgLTIgNSAtMiAtNSAtNSAtMiA1IC0yeiIvPjwvZz48L3N2Zz4K';
 /*
   Tubo Certo — motor do puzzle (lógica pura, sem DOM).
   Preservado do código original: despejo de cores, gerador de fases com
@@ -1695,35 +1756,34 @@ var SVG_C = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvM
     }
   }
 
-  // --- layout adaptativo: escolhe 1–3 fileiras para maximizar o tamanho dos tubos,
-  // considerando a largura e a altura reais da área de jogo (HUD e barra de ferramentas já descontados).
-  var TUBE_ASPECT = 380 / 140;   // proporção do SVG do kit
+  // --- layout no formato do mockup: tubos de paredes retas sobre prateleiras.
+  // Cada fileira fica sobre uma prateleira; a bancada com as ferramentas vem logo abaixo.
+  // O tamanho do tubo é o maior que cabe na largura e na altura reais (HUD e bancada descontados).
+  var TUBE_ASPECT = 3;   // tubo do mockup: 100 × 300
   function layoutFor(n) {
     var area = boardWrap;
     var cs = getComputedStyle(area);
     var W = area.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    var H = area.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var H = area.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - $('gameBench').offsetHeight;
     if (W <= 0 || H <= 0) return null;
-    var pad = Math.max(8, Math.round(W * 0.03));
-    var maxTw = Math.min(W * 0.31, 120);
+    var padX = Math.max(10, Math.round(W * 0.035));
+    var padTop = Math.max(26, Math.round(W * 0.09));
+    var shelf = Math.max(12, Math.round(W * 0.042));
+    var rowGap = Math.max(10, Math.round(W * 0.035));
+    // tela larga (ou quadrada como no mockup): uma fileira; celular comprido: 2–3 fileiras para os tubos crescerem.
     var best = null;
     for (var r = 1; r <= 3; r++) {
       var per = Math.ceil(n / r);
-      var gap = Math.max(2, Math.round(W * 0.01));
-      var rowGap = Math.round(W * 0.008);
-      var shelf = 0;
-      var twW = (W - 2 * pad - 6 - (per - 1) * gap) / per;
-      var twH = ((H - 2 * pad - 6 - (r - 1) * rowGap) / r - shelf) / TUBE_ASPECT;
-      var tw = Math.floor(Math.min(twW, twH, maxTw));
-      if (tw < 24) continue;
-      if (!best || tw > best.tw + 1) {
-        // sobra de altura: reparte um pouco em respiro (entre fileiras e nas bordas), sem inflar o painel
-        var used = r * (tw * TUBE_ASPECT + shelf) + (r - 1) * rowGap + 2 * pad + 6;
-        var extra = Math.max(0, H - used);
-        best = { r: r, per: per, gap: gap, rowGap: rowGap + (r > 1 ? Math.min(extra * 0.18 / (r - 1), 16) : 0), shelf: shelf, pad: pad, padY: pad + Math.min(extra * 0.08, 10), tw: tw };
-      }
+      if (r > 1 && per < 2) break;
+      var gap = Math.max(6, Math.round(W * (per >= 6 ? 0.024 : 0.032)));
+      var twW = (W - 2 * padX - (per - 1) * gap) / per;
+      var twH = (H - padTop - r * shelf - (r - 1) * rowGap) / r / TUBE_ASPECT;
+      var tw = Math.floor(Math.min(twW, twH, 92));
+      if (tw < 22) continue;
+      // só aceita mais uma fileira se os tubos ficarem bem maiores (mantém a cara do mockup quando dá)
+      if (!best || tw > best.tw * 1.12) best = { r: r, per: per, gap: gap, rowGap: rowGap, shelf: shelf, pad: padX, padY: padTop, tw: tw };
     }
-    return best || { r: 3, per: Math.ceil(n / 3), gap: 4, rowGap: 8, shelf: 6, pad: 8, tw: 24 };
+    return best || { r: 3, per: Math.ceil(n / 3), gap: 6, rowGap: 10, shelf: 12, pad: 10, padY: 26, tw: 22 };
   }
 
   function segSvg(c, dropped) {
@@ -1738,6 +1798,7 @@ var SVG_C = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvM
       var panel = $('boardPanel');
       panel.style.setProperty('--pad', L.pad + 'px');
       panel.style.setProperty('--padY', (L.padY || L.pad) + 'px');
+      panel.style.setProperty('--shelf', L.shelf + 'px');
       board.style.setProperty('--tw', L.tw + 'px');
       board.style.setProperty('--tgap', L.gap + 'px');
       board.style.setProperty('--rowgap', L.rowGap + 'px');

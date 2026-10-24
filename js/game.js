@@ -564,35 +564,34 @@
     }
   }
 
-  // --- layout adaptativo: escolhe 1–3 fileiras para maximizar o tamanho dos tubos,
-  // considerando a largura e a altura reais da área de jogo (HUD e barra de ferramentas já descontados).
-  var TUBE_ASPECT = 380 / 140;   // proporção do SVG do kit
+  // --- layout no formato do mockup: tubos de paredes retas sobre prateleiras.
+  // Cada fileira fica sobre uma prateleira; a bancada com as ferramentas vem logo abaixo.
+  // O tamanho do tubo é o maior que cabe na largura e na altura reais (HUD e bancada descontados).
+  var TUBE_ASPECT = 3;   // tubo do mockup: 100 × 300
   function layoutFor(n) {
     var area = boardWrap;
     var cs = getComputedStyle(area);
     var W = area.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    var H = area.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var H = area.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - $('gameBench').offsetHeight;
     if (W <= 0 || H <= 0) return null;
-    var pad = Math.max(8, Math.round(W * 0.03));
-    var maxTw = Math.min(W * 0.31, 120);
+    var padX = Math.max(10, Math.round(W * 0.035));
+    var padTop = Math.max(26, Math.round(W * 0.09));
+    var shelf = Math.max(12, Math.round(W * 0.042));
+    var rowGap = Math.max(10, Math.round(W * 0.035));
+    // tela larga (ou quadrada como no mockup): uma fileira; celular comprido: 2–3 fileiras para os tubos crescerem.
     var best = null;
     for (var r = 1; r <= 3; r++) {
       var per = Math.ceil(n / r);
-      var gap = Math.max(2, Math.round(W * 0.01));
-      var rowGap = Math.round(W * 0.008);
-      var shelf = 0;
-      var twW = (W - 2 * pad - 6 - (per - 1) * gap) / per;
-      var twH = ((H - 2 * pad - 6 - (r - 1) * rowGap) / r - shelf) / TUBE_ASPECT;
-      var tw = Math.floor(Math.min(twW, twH, maxTw));
-      if (tw < 24) continue;
-      if (!best || tw > best.tw + 1) {
-        // sobra de altura: reparte um pouco em respiro (entre fileiras e nas bordas), sem inflar o painel
-        var used = r * (tw * TUBE_ASPECT + shelf) + (r - 1) * rowGap + 2 * pad + 6;
-        var extra = Math.max(0, H - used);
-        best = { r: r, per: per, gap: gap, rowGap: rowGap + (r > 1 ? Math.min(extra * 0.18 / (r - 1), 16) : 0), shelf: shelf, pad: pad, padY: pad + Math.min(extra * 0.08, 10), tw: tw };
-      }
+      if (r > 1 && per < 2) break;
+      var gap = Math.max(6, Math.round(W * (per >= 6 ? 0.024 : 0.032)));
+      var twW = (W - 2 * padX - (per - 1) * gap) / per;
+      var twH = (H - padTop - r * shelf - (r - 1) * rowGap) / r / TUBE_ASPECT;
+      var tw = Math.floor(Math.min(twW, twH, 92));
+      if (tw < 22) continue;
+      // só aceita mais uma fileira se os tubos ficarem bem maiores (mantém a cara do mockup quando dá)
+      if (!best || tw > best.tw * 1.12) best = { r: r, per: per, gap: gap, rowGap: rowGap, shelf: shelf, pad: padX, padY: padTop, tw: tw };
     }
-    return best || { r: 3, per: Math.ceil(n / 3), gap: 4, rowGap: 8, shelf: 6, pad: 8, tw: 24 };
+    return best || { r: 3, per: Math.ceil(n / 3), gap: 6, rowGap: 10, shelf: 12, pad: 10, padY: 26, tw: 22 };
   }
 
   function segSvg(c, dropped) {
@@ -607,6 +606,7 @@
       var panel = $('boardPanel');
       panel.style.setProperty('--pad', L.pad + 'px');
       panel.style.setProperty('--padY', (L.padY || L.pad) + 'px');
+      panel.style.setProperty('--shelf', L.shelf + 'px');
       board.style.setProperty('--tw', L.tw + 'px');
       board.style.setProperty('--tgap', L.gap + 'px');
       board.style.setProperty('--rowgap', L.rowGap + 'px');

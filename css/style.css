@@ -626,3 +626,64 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
   .play-area { padding-top: 1cqw !important; padding-bottom: .6cqw !important; }
   .game-controls { padding-top: 1cqw !important; }
 }
+
+/* ==========================================================================
+   Tubo Certo — FORMATO DO MOCKUP "EXEMPLOS EM JOGO"
+   Tubo de paredes retas (100×300) com aro metálico, peças quadradas na largura toda,
+   prateleira de madeira sob cada fileira e bancada de madeira com as ferramentas.
+   (Vem por último e usa !important porque substitui blocos de refinamento anteriores.)
+   ========================================================================== */
+.play-area { flex-direction: column !important; justify-content: center !important; align-items: stretch !important; padding: 2.4cqw 3.2cqw 1.6cqw !important; }
+#boardPanel {
+  width: 100%; align-items: center;
+  padding: var(--padY, 30px) var(--pad, 14px) 0 !important;
+  border: 3px solid var(--ink) !important; border-bottom: 0 !important;
+  border-radius: 4.4cqw 4.4cqw 0 0 !important;
+  box-shadow: none !important;
+  background: radial-gradient(ellipse at 18% 8%, rgba(255,255,255,.5), transparent 50%), var(--paper), linear-gradient(180deg, #fff6dc, #f3dfae) !important;
+}
+#boardPanel > .board-hint { position: absolute !important; top: 1.6cqw !important; bottom: auto !important; left: 50% !important; transform: translateX(-50%) !important; margin: 0 !important; white-space: nowrap !important; }
+#boardPanel > .board-hint.gone { display: block !important; opacity: 0; }
+.board-rows { gap: var(--rowgap, 12px) !important; width: 100%; }
+.tube-row { position: relative; gap: var(--tgap, 8px) !important; padding-bottom: var(--shelf, 14px); width: 100%; }
+.tube-row::after { /* prateleira: tampo claro + frente escura + cantoneiras de latão */
+  content: ''; position: absolute; left: calc(-1 * var(--pad, 14px) - 2.6cqw); right: calc(-1 * var(--pad, 14px) - 2.6cqw); bottom: 0; height: var(--shelf, 14px); z-index: 0;
+  background:
+    radial-gradient(circle at 3.2% 62%, #ffe08a 0 2.2px, #8a5a12 2.6px 3.4px, transparent 3.8px),
+    radial-gradient(circle at 96.8% 62%, #ffe08a 0 2.2px, #8a5a12 2.6px 3.4px, transparent 3.8px),
+    linear-gradient(180deg, #f0c27e 0 34%, #c8853f 34% 100%);
+  border: 2.5px solid var(--ink); border-radius: 4px; box-shadow: 0 3px 0 rgba(27, 17, 9, .35);
+}
+.tube-row:not(:last-child)::after { left: calc(-1 * var(--pad, 14px) + 2px); right: calc(-1 * var(--pad, 14px) + 2px); }
+.tube { width: var(--tw, 60px) !important; height: calc(var(--tw, 60px) * 3) !important; filter: drop-shadow(0 3px 2px rgba(27, 17, 9, .18)) !important; position: relative; z-index: 1; }
+.tube .layers { left: 11.6% !important; right: 11.6% !important; top: 8.2% !important; bottom: 5.6% !important; gap: .9% !important; }
+.tube .seg { height: calc((100% - 2.7%) / 4) !important; }
+.tube.selected { transform: translateY(-5%) !important; }
+
+/* bancada de madeira com as ferramentas (mesmos botões redondos da tela inicial) */
+#gameBench {
+  position: relative; margin: 0 1.2cqw; padding: 3.4cqw 3cqw 3.6cqw !important; gap: 5.6cqw !important; justify-content: center;
+  background: repeating-linear-gradient(90deg, transparent 0 22%, rgba(0, 0, 0, .16) 22% calc(22% + 2px)), linear-gradient(180deg, #8f5728, #6a3c18 70%, #5a3214);
+  border: 3px solid var(--ink); border-top: 0; border-radius: 0 0 4cqw 4cqw;
+  box-shadow: inset 0 6px 6px -4px rgba(0, 0, 0, .45), 0 4px 0 rgba(0, 0, 0, .45);
+}
+#gameBench::before, #gameBench::after { /* canos laterais que sustentam a bancada */
+  content: ''; position: absolute; top: 18%; bottom: -10px; width: 2.6cqw; border: 2.5px solid var(--ink); border-radius: 3px;
+  background: linear-gradient(90deg, #4f6f8f, #9db8d0 40%, #3d5670);
+}
+#gameBench::before { left: -3.4cqw; } #gameBench::after { right: -3.4cqw; }
+#gameBench .round-btn { --sz: clamp(46px, 13.4cqw, 64px) !important; }
+
+/* proporções do mockup: HUD e bancada mais robustos; tabuleiro apoiado embaixo, perto do polegar */
+.play-area { justify-content: center !important; }
+.hud-label { font-size: 3.1cqw !important; }
+.hud-value { font-size: 10cqw !important; }
+.hud-card { padding: 1.4cqw .6cqw 1.2cqw !important; }
+.wallet-coins { font-size: 5.6cqw !important; }
+.wallet-coins .ico.coin { width: 7cqw !important; height: 7cqw !important; }
+.wallet-coins .plus { width: 6cqw !important; height: 6cqw !important; }
+.wallet-lives .heart { max-width: 5.6cqw !important; }
+.hud-wallet { padding: 1.6cqw 2cqw !important; gap: 1.2cqw !important; }
+#gameBench { padding: 4cqw 3cqw 4.4cqw !important; gap: 5cqw !important; }
+#gameBench .round-btn { --sz: clamp(54px, 16.6cqw, 78px) !important; }
+#gameBench .badge { min-width: 24px; height: 24px; font-size: 12px; top: -6px; right: -6px; }
