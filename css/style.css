@@ -712,3 +712,30 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 .tube-row:not(:last-child)::after { left: calc(-1 * var(--pad, 14px) - 1cqw); right: calc(-1 * var(--pad, 14px) - 1cqw); }
 
 #boardPanel > .board-hint { top: 1.6cqw !important; }
+
+/* ==========================================================================
+   PERSONAGENS E ELEMENTOS GERADOS POR IA (assets/personagens) — último bloco
+   ========================================================================== */
+.home-fist { display: none !important; }
+.home-mascot { filter: drop-shadow(0 1cqw 0 rgba(27, 17, 9, .32)) !important; }
+.home-mascot.blue { left: 4% !important; height: 82% !important; }
+.home-mascot.red { right: 4% !important; height: 82% !important; }
+.win-star-top { width: 14cqw !important; height: auto !important; filter: drop-shadow(0 .8cqw 0 rgba(27, 17, 9, .3)) drop-shadow(0 0 8px rgba(255, 220, 90, .8)) !important; }
+.stars-row { align-items: flex-end; }
+.stars-row .star-img { width: 18cqw; height: auto; filter: drop-shadow(0 .8cqw 0 rgba(27, 17, 9, .3)); }
+.stars-row .star-img:nth-child(2) { width: 22cqw; margin-bottom: 3cqw; }
+.stars-row .star-img.on { animation: starPop .6s cubic-bezier(.3, 1.6, .5, 1) both, glowPulse 2s 1s ease-in-out infinite; }
+.stars-row .star-img:nth-child(2).on { animation-delay: .15s, 1s; } .stars-row .star-img:nth-child(3).on { animation-delay: .3s, 1s; }
+.stars-row .star-img.off { filter: grayscale(1) brightness(1.5) opacity(.55) drop-shadow(0 .6cqw 0 rgba(27, 17, 9, .25)); animation: none; }
+.win-mascots .blue { left: 12% !important; height: 100% !important; }
+.win-mascots .red { right: 8% !important; height: 100% !important; transform: none !important; animation: cheer 0.9s ease-in-out -.45s infinite !important; }
+.reward-line img.chest { width: 15cqw; height: auto; animation: chestWiggle 1.2s ease-in-out infinite; filter: drop-shadow(0 .6cqw 0 rgba(27, 17, 9, .3)); }
+.fail-mascot img { filter: drop-shadow(0 1cqw 0 rgba(0, 0, 0, .45)) !important; }
+
+/* personagens mais largos que os recortes antigos: cada um ocupa metade da largura, sem sobrepor */
+.home-mascot { object-fit: contain; object-position: 50% 100%; max-width: 49%; }
+.home-mascot.blue { left: 1% !important; height: 84% !important; }
+.home-mascot.red { right: 1% !important; height: 84% !important; }
+.win-mascots img { object-fit: contain; object-position: 50% 100%; }
+.win-mascots .blue { left: 3% !important; height: 100% !important; max-width: 44%; }
+.win-mascots .red { right: 3% !important; height: 100% !important; max-width: 52%; }

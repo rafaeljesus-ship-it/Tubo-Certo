@@ -18,6 +18,7 @@
     valido: 'assets/jogo/estado-valido.svg',
     completo: 'assets/jogo/estado-completo.svg'
   };
+  function charUrl(n) { return 'assets/personagens/' + n + '.png'; }
   function pieceUrl(name) { return 'assets/jogo/peca-' + name + '.png'; }
 
   var TEST_MODE = /[?&]teste=1/.test(location.search);
@@ -717,7 +718,7 @@
     var stars = E.starsForResult(state.moves, state.target, state.hardLimit);
     recordLevelResult(state.level, stars);
     var s = '';
-    for (var i = 1; i <= 3; i++) s += ico('star', i <= stars ? 'on' : 'off');
+    for (var i = 1; i <= 3; i++) s += '<img class="star-img ' + (i <= stars ? 'on' : 'off') + '" src="' + charUrl('estrela') + '" alt="" draggable="false">';
     $('winStars').innerHTML = s;
     $('winStars').setAttribute('aria-label', stars + ' de 3 estrelas');
     var best = getBest(state.colors);
@@ -726,7 +727,7 @@
     state.pendingReward = rollReward();
     $('rewardTag').textContent = 'VOCÊ GANHOU';
     $('rewardTag').className = 'reward-tag';
-    $('rewardLine').innerHTML = ico('chest', 'chest') + '<span class="reward-hint">Abra o baú</span>';
+    $('rewardLine').innerHTML = '<img class="chest" src="' + charUrl('bau') + '" alt=""><span class="reward-hint">Abra o baú</span>';
     $('winMainLabel').textContent = 'ABRIR BAÚ';
     $('winMainBtn').dataset.step = 'chest';
     $('view-win').classList.remove('shake');
@@ -898,6 +899,7 @@
 
   // ===================== Início =====================
   function start() {
+    ['azul-andando', 'vermelho-andando', 'azul-vitoria', 'vermelho-vitoria', 'vermelho-derrota', 'estrela', 'bau'].forEach(function (n) { new Image().src = charUrl(n); });
     [ART.tubo, ART.selecionado, ART.valido, ART.completo].concat(COLOR_NAMES.map(pieceUrl)).forEach(function (u) { new Image().src = u; });
     state.coins = loadCoins();
     syncLives();

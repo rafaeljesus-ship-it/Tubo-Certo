@@ -26,6 +26,7 @@ Sem esse parâmetro, as compras em dinheiro mostram um aviso de "pagamento indis
 | `assets/cenario-oficina.jpg` | Cenário de fundo |
 | `assets/mascotes/*.png` | Mascotes com **fundo transparente** (recortados do mockup) |
 | `assets/jogo/` | Arte do gameplay gerada por IA: tubo, 10 peças, prateleira e estados (selecionado, válido, completo) |
+| `assets/personagens/` | Mascotes (andando, vitória, derrota), estrela e baú gerados por IA, com fundo transparente |
 | `assets/originais/` | Assets originais do pacote (mantidos como estavam; não são mais usados) |
 | `fonts/` | Lilita One + Nunito (locais, funcionam offline) |
 | `referencias/` | Mockup e as 10 telas de referência |

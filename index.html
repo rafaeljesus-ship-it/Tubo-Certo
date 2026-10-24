@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1b1109">
 <title>Tubo Certo</title>
-<link rel="stylesheet" href="css/style.css?v=4">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -72,9 +72,8 @@
       <span class="logo-1">TUBO</span><span class="logo-2">CERTO</span>
     </h1>
     <div class="home-stage" aria-hidden="true">
-      <img class="home-mascot blue" src="assets/mascotes/azul-andando.png?v=4" alt="">
-      <img class="home-fist" src="assets/mascotes/punho.png?v=4" alt="">
-      <img class="home-mascot red" src="assets/mascotes/vermelho-andando.png?v=4" alt="">
+      <img class="home-mascot blue" src="assets/personagens/azul-andando.png" alt="">
+      <img class="home-mascot red" src="assets/personagens/vermelho-andando.png" alt="">
     </div>
     <div class="home-bottom">
       <button class="btn-big yellow" id="playBtn" type="button"><svg class="ico"><use href="#i-play"/></svg><span>JOGAR</span></button>
@@ -229,17 +228,17 @@
     <div class="sunburst" aria-hidden="true"></div>
     <div class="sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="win-content">
-      <svg class="win-star-top" aria-hidden="true"><use href="#i-star"/></svg>
+      <img class="win-star-top" src="assets/personagens/estrela.png" alt="" aria-hidden="true">
       <div class="ribbon"><svg viewBox="0 0 340 84" preserveAspectRatio="none" aria-hidden="true"><use href="#ribbon-shape"/></svg><h2>NÍVEL CONCLUÍDO!</h2></div>
       <div class="stars-row" id="winStars" aria-label="Estrelas"></div>
       <p class="win-sub" id="winSub"></p>
       <div class="win-mascots" aria-hidden="true">
-        <img class="blue" src="assets/mascotes/azul-vitoria.png?v=4" alt="">
-        <img class="red" src="assets/mascotes/vermelho-andando.png?v=4" alt="">
+        <img class="blue" src="assets/personagens/azul-vitoria.png" alt="">
+        <img class="red" src="assets/personagens/vermelho-vitoria.png" alt="">
       </div>
       <div class="reward-box">
         <span class="reward-tag" id="rewardTag">VOCÊ GANHOU</span>
-        <div class="reward-line" id="rewardLine"><svg class="ico chest"><use href="#i-chest"/></svg><span class="reward-hint" id="rewardHint">Abra o baú</span></div>
+        <div class="reward-line" id="rewardLine"><img class="chest" src="assets/personagens/bau.png" alt=""><span class="reward-hint" id="rewardHint">Abra o baú</span></div>
       </div>
       <button class="btn-big green" id="winMainBtn" type="button"><span id="winMainLabel">ABRIR BAÚ</span></button>
       <div class="round-row">
@@ -257,7 +256,7 @@
     <div class="fail-content">
       <h2 class="ops" id="failTitle">OPS!</h2>
       <div class="ribbon paper"><svg viewBox="0 0 340 84" preserveAspectRatio="none" aria-hidden="true"><use href="#ribbon-shape"/></svg><h3 id="failRibbon">TENTE NOVAMENTE</h3></div>
-      <div class="fail-mascot" aria-hidden="true"><img src="assets/mascotes/vermelho-derrota.png?v=4" alt=""></div>
+      <div class="fail-mascot" aria-hidden="true"><img src="assets/personagens/vermelho-derrota.png" alt=""></div>
       <p class="fail-msg" id="failMessage"></p>
       <button class="btn-big red" id="failMainBtn" type="button"><span id="failMainLabel">TENTAR DE NOVO</span></button>
       <div class="round-row">
@@ -293,7 +292,7 @@
 </div>
 </div>
 
-<script src="js/engine.js?v=4"></script>
-<script src="js/game.js?v=4"></script>
+<script src="js/engine.js"></script>
+<script src="js/game.js"></script>
 </body>
 </html>

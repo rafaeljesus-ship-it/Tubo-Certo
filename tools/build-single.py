@@ -18,6 +18,9 @@ for f, uri in art.items():
 js = js.replace("function pieceUrl(name) { return 'assets/jogo/peca-' + name + '.png'; }",
                 "var PIECES = {" + ",".join("'%s':'%s'" % (f[5:-4], u) for f, u in art.items() if f.startswith('peca-')) + "};\n  function pieceUrl(name) { return PIECES[name]; }")
 consts = ''
+import json
+chars = {f[:-4]: b64('assets/personagens/' + f, 'image/png') for f in os.listdir('assets/personagens')}
+js = js.replace("function charUrl(n) { return 'assets/personagens/' + n + '.png'; }", 'var CHARS = ' + json.dumps(chars) + ';\n  function charUrl(n) { return CHARS[n]; }')
 assert "'assets/jogo/" not in js and 'assets/jogo/peca-' not in js, 'sobrou caminho de arte'
 # o CSS também referencia a prateleira via border-image
 css = css.replace("url('../assets/jogo/prateleira.png')", "url('" + art['prateleira.png'] + "')")
@@ -25,8 +28,10 @@ html = open('index.html').read()
 html = re.sub(r'<link rel="stylesheet" href="css/style.css[^"]*">', lambda m: '<style>\n' + css + '\n</style>', html)
 html = re.sub(r'<script src="js/engine.js[^"]*"></script>\s*<script src="js/game.js[^"]*"></script>', lambda m: '<script>\n' + js + '\n</script>', html)
 html = html.replace('assets/cenario-oficina.jpg', b64('assets/cenario-oficina.jpg', 'image/jpeg'))
-for f in os.listdir('assets/mascotes'):
-    html = re.sub(r'assets/mascotes/' + re.escape(f) + r'(\?v=\d+)?', lambda m, f=f: b64('assets/mascotes/' + f, 'image/png'), html)
+for d in ('assets/mascotes', 'assets/personagens'):
+    for f in os.listdir(d):
+        html = re.sub(re.escape(d + '/' + f) + r'(\?v=\d+)?', lambda m, d=d, f=f: b64(d + '/' + f, 'image/png'), html)
+
 assert 'href="css/' not in html and 'src="js/' not in html and 'src="assets' not in html and 'url(../' not in html
 os.makedirs('dist', exist_ok=True)
 open('dist/tubo-certo.html', 'w').write(html)
