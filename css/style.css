@@ -805,3 +805,19 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 .level-tile.tier-hard:not(.locked) .num { color: #fff; -webkit-text-stroke: .06em var(--ink); paint-order: stroke fill; }
 .level-tile.tier-medium:not(.locked) { background: linear-gradient(180deg, #ffd7a0, #ffa63a 60%, #e57f12); }
 .level-tile[data-tag] .num { margin-top: 2.4cqw; }
+
+/* ==========================================================================
+   TUTORIAL (fase 1) e selo de dica grátis
+   ========================================================================== */
+.tut { position: absolute; inset: 0; z-index: 9; pointer-events: none; }
+.tut[hidden] { display: none; }
+.tut-bubble { position: absolute; left: 50%; transform: translateX(-50%); max-width: 84%; padding: 2.4cqw 4.4cqw; text-align: center; font: 400 4.6cqw/1.15 var(--display); letter-spacing: .01em; color: var(--ink); background: #fff7dc; border: 3px solid var(--ink); border-radius: 4cqw; box-shadow: 0 3px 0 var(--ink); }
+.tut-bubble.nudge { animation: nudge .35s ease; }
+@keyframes nudge { 20% { transform: translateX(calc(-50% - 7px)); } 40% { transform: translateX(calc(-50% + 7px)); } 60% { transform: translateX(calc(-50% - 4px)); } 80% { transform: translateX(calc(-50% + 4px)); } }
+.tut-hand { position: absolute; filter: drop-shadow(0 .6cqw 0 rgba(27, 17, 9, .35)); animation: tutPoke .8s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes tutPoke { 50% { transform: translateY(-9px); } }
+.tut-skip { position: absolute; right: 2cqw; bottom: 2cqw; pointer-events: auto; padding: 1.4cqw 3.4cqw; font: 400 3.2cqw/1 var(--display); letter-spacing: .04em; color: #fff; background: rgba(27, 17, 9, .78); border: 2px solid rgba(255, 238, 190, .6); border-radius: 999px; }
+.badge.free { min-width: 0; padding: 0 6px; background: var(--green); font-size: 10px; letter-spacing: .02em; right: -10px; }
+@media (prefers-reduced-motion: reduce) { .tut-hand, .tut-bubble.nudge { animation: none; } }
+.tut-bubble { white-space: nowrap; font-size: 3.9cqw; padding: 1.3cqw 4cqw; border-radius: 999px; }
+.toast.high { bottom: 34cqh; }

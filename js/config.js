@@ -25,6 +25,9 @@ window.TUBO_CONFIG = {
     // Compra única (não consumível): tira os anúncios entre fases; os anúncios opcionais de recompensa continuam.
     { id: 'sem_anuncios', kind: 'noads', nonConsumable: true, fallback: 'R$ 14,90' }
   ],
+  // Presentes para quem está começando (uma vez por instalação)
+  welcome: { coins: 150 },       // moedas na primeira abertura
+  hardGiftHints: 1,              // dicas grátis ao chegar na primeira fase difícil
   // Recompensas por anúncio
   ads: {
     lifeReward: 1,            // vidas por anúncio na tela de vidas
@@ -32,6 +35,6 @@ window.TUBO_CONFIG = {
     coinAdsPerDay: 5,         // limite diário de anúncios por moedas
     doubleChest: true,        // botão "dobrar prêmio" depois de abrir o baú
     // Anúncio de tela cheia ao concluir uma fase (some com a compra "Sem anúncios")
-    interstitial: { enabled: true, fromLevel: 3, everyLevels: 1, minGapMs: 45000 }
+    interstitial: { enabled: true, fromLevel: 6, everyLevels: 1, minGapMs: 45000 }
   }
 };

@@ -61,8 +61,9 @@
   // ===================== Toast / modal =====================
   var toastEl = $('toast');
   var toastTimer = null;
-  function showToast(msg, ms) {
+  function showToast(msg, ms, high) {
     toastEl.textContent = msg;
+    toastEl.classList.toggle('high', !!high);
     toastEl.classList.add('show');
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, ms || 2300);
@@ -161,6 +162,75 @@
     $('settingRestoreRow').hidden = Platform.mode !== 'native';
   }
 
+  // ===================== Boas-vindas, tutorial e presentes =====================
+  var ONB_KEY = 'tubo-certo-onboard';
+  var onb = store(ONB_KEY, null);
+  function saveOnb() { save(ONB_KEY, onb); }
+  // jogador que já tinha progresso antes desta versão não recebe presentes nem tutorial
+  function initOnboarding() {
+    if (onb) return null;
+    var existing = false;
+    try { existing = localStorage.getItem(COINS_KEY) !== null || localStorage.getItem(LEVELS_KEY) !== null; } catch (e) { /* sem storage */ }
+    onb = { welcome: true, hardGift: existing, freeHints: 0, tutorial: existing };
+    saveOnb();
+    return existing ? null : { coins: CFG.welcome.coins };
+  }
+  var TUT_ENABLED = Platform.mode !== 'test' || /[?&]tutorial=1/.test(location.search);
+  var tut = { active: false, pours: 0, closing: false };
+  var TUT_POURS = 2;
+  function tutNextMove() {
+    var path = E.solvePath(E.deepClone(state.tubes), 20000);
+    return path && path.length ? { from: path[0][0], to: path[0][1] } : null;
+  }
+  function tutShouldRun() { return TUT_ENABLED && onb && !onb.tutorial && state.level === 1 && currentView === 'game' && !state.won && !state.gate; }
+  function tutEnd(done) {
+    tut.active = false; tut.closing = false; $('tut').hidden = true;
+    if (done && !onb.tutorial) { onb.tutorial = true; saveOnb(); }
+  }
+  // a faixa de texto fica logo acima da borda de cima dos tubos (onde fica a dica discreta)
+  function tutTop(box) { var pn = $('boardPanel').getBoundingClientRect(), o = box.getBoundingClientRect(); return Math.round(pn.top - o.top + 4); }
+  function tutRender() {
+    var box = $('tut');
+    if (!tut.active || !tutShouldRun()) { if (tut.active && !tut.closing) { tut.active = false; } box.hidden = !tut.closing; if (!tut.closing) return; }
+    var text = $('tutText'), hand = $('tutHand');
+    if (tut.closing) { hand.style.display = 'none'; text.textContent = 'Muito bem! Agora é com você'; text.style.top = tutTop(box) + 'px'; box.hidden = false; return; }
+    var mv = tutNextMove();
+    if (!mv) { tutEnd(false); return; }
+    var target = state.selected === mv.from ? mv.to : mv.from;
+    text.textContent = state.selected === mv.from ? 'Agora toque aqui' : (tut.pours === 0 ? 'Toque neste tubo' : 'Isso! Toque neste tubo');
+    var el = board.querySelectorAll('.tube')[target];
+    if (!el) { box.hidden = true; return; }
+    box.hidden = false; hand.style.display = '';
+    var o = box.getBoundingClientRect(), r = el.getBoundingClientRect();
+    var hw = Math.max(44, Math.min(68, app.clientWidth * 0.155)), hh = hw * 84 / 64;
+    hand.style.width = hw + 'px'; hand.style.height = hh + 'px';
+    hand.style.left = Math.round(r.left - o.left + r.width / 2 - hw * 29 / 64) + 'px';
+    hand.style.top = Math.round(r.bottom - o.top - 4) + 'px';
+    text.style.top = tutTop(box) + 'px';
+  }
+  function tutStart() {
+    if (!tutShouldRun()) return;
+    tut.active = true; tut.pours = 0; tut.closing = false; state.tutHold = true;
+    tutRender();
+  }
+  function tutAfterPour() {
+    if (!tut.active) return;
+    tut.pours++;
+    if (tut.pours >= TUT_POURS) {
+      tut.closing = true; tutRender();
+      setTimeout(function () { tutEnd(true); }, 2600);
+    } else { tutRender(); }
+  }
+  // true = o toque não é o esperado agora (tutorial segura o jogador no caminho)
+  function tutBlocks(idx) {
+    if (!tut.active || tut.closing) return false;
+    var mv = tutNextMove(); if (!mv) return false;
+    var want = state.selected === mv.from ? mv.to : mv.from;
+    if (idx === want) return false;
+    sfxError(); var t = $('tutText'); t.classList.remove('nudge'); void t.offsetWidth; t.classList.add('nudge');
+    return true;
+  }
+
   // ===================== Moedas =====================
   function loadCoins() {
     try { return parseInt(localStorage.getItem(COINS_KEY) || '0', 10) || 0; } catch (e) { return 0; }
@@ -257,6 +327,7 @@
     if (currentView === 'game' && name !== 'game') claimChest();
     views.forEach(function (v) { $('view-' + v).classList.toggle('active', v === name); });
     currentView = name;
+    if (name !== 'game' && tut.active) tutEnd(false);
     hideOverlays();
     syncCoinDisplays();
     if (name === 'levels') renderLevels();
@@ -472,7 +543,8 @@
     if (path && path.length) move = { from: path[0][0], to: path[0][1] };
     else move = E.findHint(state.tubes);
     if (!move) { showToast('Nenhum movimento disponível agora.'); return false; }
-    if (!spendCoins(HINT_COST)) return false;
+    if (onb && onb.freeHints > 0) { onb.freeHints--; saveOnb(); updateHintBadge(); }
+    else if (!spendCoins(HINT_COST)) return false;
     state.selected = null;
     state.hint = move;
     render();
@@ -480,6 +552,13 @@
     doHint.t = setTimeout(function () { state.hint = null; if (currentView === 'game') render(); }, 5000);
     showToast('Dica: toque no tubo que pulsa e depois no outro destacado.');
     return true;
+  }
+
+  function updateHintBadge() {
+    var free = onb && onb.freeHints > 0;
+    $('hintBadge').textContent = free ? 'GRÁTIS' : HINT_COST;
+    $('hintBadge').classList.toggle('free', !!free);
+    $('powerupsHintBtn').innerHTML = free ? '<span>GRÁTIS</span>' : '<svg class="ico coin"><use href="#i-coin"/></svg><span>' + HINT_COST + '</span>';
   }
 
   function doExtraTube() {
@@ -569,11 +648,19 @@
   var board = $('board');
   var boardWrap = $('boardWrap');
 
+  function giftOnHardLevel() {
+    if (!onb || onb.hardGift || state.tier !== 'hard') return;
+    onb.hardGift = true; onb.freeHints += CFG.hardGiftHints; saveOnb(); updateHintBadge();
+    setTimeout(function () { showToast('Presente: ' + CFG.hardGiftHints + ' dica grátis para esta fase difícil! Toque na lâmpada.', 4200, true); }, 400);
+  }
+
   function startLevel(n) {
     syncLives();
     newLevel(n);
     showView('game');
-    if (state.lives <= 0) { state.gate = 'nolives'; openFail(); }
+    if (state.lives <= 0) { state.gate = 'nolives'; openFail(); return; }
+    giftOnHardLevel();
+    tutStart();
   }
 
   function newLevel(level) {
@@ -601,6 +688,7 @@
     state.hint = null;
     state.gate = null;
     state.pendingReward = null;
+    if (tut.active) { tut.pours = 0; tut.closing = false; }
     if (currentView === 'game') { hideOverlays(); render(); }
   }
 
@@ -628,6 +716,7 @@
 
   function handleTubeClick(idx) {
     if (state.won || state.gate) return;
+    if (tutBlocks(idx)) return;
     state.hint = null;
     var tubes = state.tubes;
     if (state.selected === null) {
@@ -646,6 +735,7 @@
       state.lastPourTo = idx;
       var closed = E.tubeStatus(tubes[idx]) === 'solved';
       render();
+      tutAfterPour();
       vibrate(closed ? 25 : 12);
       if (E.isSolved(tubes)) {
         onWin();
@@ -734,7 +824,7 @@
         rows[Math.min(L.r - 1, Math.floor(idx / per))].appendChild(el);
       });
     }
-    $('boardHint').classList.toggle('gone', state.moves > 0 || state.selected !== null);
+    $('boardHint').classList.toggle('gone', state.moves > 0 || state.selected !== null || tut.active);
     $('levelValue').textContent = state.level;
     $('movesValue').textContent = state.moves;
     $('undoBtn').disabled = !levelInProgress() || state.history.length === 0;
@@ -749,6 +839,7 @@
     renderLives();
     syncCoinDisplays();
     state.lastPourTo = null;
+    if (tut.active) tutRender();
   }
   if (window.ResizeObserver) new ResizeObserver(function () { if (currentView === 'game') render(); }).observe(boardWrap);
 
@@ -800,6 +891,7 @@
   }
 
   function onWin() {
+    if (tut.active) tutEnd(true);
     state.won = true;
     state.hint = null;
     saveBest(state.colors, state.moves);
@@ -978,6 +1070,7 @@
   on('settingAdsRow', function () {
     Platform.privacyOptions().then(function (ok) { if (!ok) showToast('Nenhuma opção de privacidade disponível para a sua região.'); });
   });
+  $('tutSkip').addEventListener('click', function () { sfxClick(); tutEnd(true); render(); });
   on('settingResetRow', function () {
     openModal('Apagar progresso?', '<p>Isso zera moedas, vidas, estrelas e recordes deste aparelho. Não dá para desfazer.</p>', [
       { label: 'APAGAR', cls: 'danger', onClick: function () {
@@ -1027,8 +1120,14 @@
     syncCoinDisplays();
     showView('home');
 
+    var welcome = initOnboarding();
+    if (welcome) addCoins(welcome.coins);
+    updateHintBadge();
     var info = checkDailyStreak();
-    if (info) {
+    if (welcome) {
+      $('streakText').textContent = 'Bem-vindo! Presente: +' + welcome.coins + ' moedas';
+      $('streakBanner').hidden = false;
+    } else if (info) {
       var txt = 'Sequência de ' + info.count + (info.count === 1 ? ' dia' : ' dias') + '! +' + info.bonus + ' moedas';
       $('streakText').textContent = txt;
       $('streakBanner').hidden = false;

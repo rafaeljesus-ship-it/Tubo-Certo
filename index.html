@@ -124,9 +124,19 @@
         <p class="board-hint" id="boardHint">Toque num tubo e depois em outro</p>
         <div class="board-rows" id="board"></div>
       </div>
-      <footer class="game-controls bench" id="gameBench">
+      <div class="tut" id="tut" hidden>
+      <div class="tut-bubble" id="tutText" role="status"></div>
+      <svg class="tut-hand" id="tutHand" viewBox="0 0 64 84" aria-hidden="true">
+        <path d="M32 84 V64" stroke="#1b1109" stroke-width="11" stroke-linecap="butt"/>
+        <path d="M20 40 Q10 38 8 48 Q6 62 18 66 H46 Q58 62 56 46 Q54 36 44 40 Z" fill="#fff" stroke="#1b1109" stroke-width="3.2" stroke-linejoin="round"/>
+        <rect x="23" y="3" width="18" height="46" rx="9" fill="#fff" stroke="#1b1109" stroke-width="3.2"/>
+        <path d="M27 52 V60 M32 52 V62 M37 52 V60" stroke="#1b1109" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6"/>
+      </svg>
+      <button class="tut-skip" id="tutSkip" type="button">PULAR</button>
+    </div>
+    <footer class="game-controls bench" id="gameBench">
       <button class="round-btn" id="undoBtn" type="button" aria-label="Desfazer movimento"><svg class="ico"><use href="#i-undo"/></svg><span class="badge" id="undoBadge">0</span></button>
-      <button class="round-btn" id="hintBtn" type="button" aria-label="Dica, 50 moedas"><svg class="ico"><use href="#i-bulb"/></svg><span class="badge">50</span></button>
+      <button class="round-btn" id="hintBtn" type="button" aria-label="Dica, 50 moedas"><svg class="ico"><use href="#i-bulb"/></svg><span class="badge" id="hintBadge">50</span></button>
       <button class="round-btn" id="extraTubeBtn" type="button" aria-label="Tubo extra, 100 moedas"><svg class="ico"><use href="#i-plus"/></svg><span class="badge">100</span></button>
       <button class="round-btn" id="restartBtn" type="button" aria-label="Reiniciar fase"><svg class="ico"><use href="#i-restart"/></svg></button>
       </footer>

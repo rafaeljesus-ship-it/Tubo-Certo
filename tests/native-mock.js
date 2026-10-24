@@ -111,16 +111,16 @@ const BRIDGE = `
   ok((await log()).filter(x => x === 'showAd').length === 2 && (await log()).filter(x => x.startsWith('prepare:')).length >= 3, 'novo anúncio é pré-carregado após cada exibição');
 
   console.log('# anúncio entre fases (nativo)');
-  await p.evaluate(() => { localStorage.setItem('tubo-certo-levels', JSON.stringify({ unlocked: 6, stars: {} })); localStorage.removeItem('tubo-certo-noads'); localStorage.setItem('tubo-certo-lives', JSON.stringify({ lives: 5, nextRefillAt: null })); });
+  await p.evaluate(() => { localStorage.setItem('tubo-certo-levels', JSON.stringify({ unlocked: 9, stars: {} })); localStorage.removeItem('tubo-certo-noads'); localStorage.setItem('tubo-certo-lives', JSON.stringify({ lives: 5, nextRefillAt: null })); });
   await p.reload(); await p.waitForTimeout(700);
   ok((await log()).some(x => x === 'prepareInter:ca-app-pub-3940256099942544/1033173712'), 'intersticial de TESTE pré-carregado');
   async function winCurrent() { const t = await p.evaluate(() => [...document.querySelectorAll('#board .tube')].map(t => [...t.querySelectorAll('.seg')].map(s => +s.dataset.c)));
     const path = await p.evaluate(t => window.TuboEngine.solvePath(t, 60000), t);
     for (const [a, b] of path) { await p.locator('#board .tube').nth(a).click(); await p.locator('#board .tube').nth(b).click(); } await p.waitForTimeout(900); }
-  await p.click('#playBtn'); await p.locator('.level-tile:not(.locked)').nth(2).click(); await winCurrent();   // fase 3
+  await p.click('#playBtn'); await p.locator('.level-tile:not(.locked)').nth(5).click(); await winCurrent();   // fase 6
   await p.click('#winMainBtn'); await p.click('#winMainBtn'); await p.waitForTimeout(500);
-  ok((await log()).filter(x => x === 'showInter').length === 1, 'fase 3 concluída: showInterstitial chamado uma vez');
-  ok((await p.textContent('#levelValue')) === '4', 'depois que o anúncio fecha, a fase 4 abre');
+  ok((await log()).filter(x => x === 'showInter').length === 1, 'fase 6 concluída: showInterstitial chamado uma vez');
+  ok((await p.textContent('#levelValue')) === '7', 'depois que o anúncio fecha, a fase 7 abre');
   ok((await log()).filter(x => x.startsWith('prepareInter:')).length >= 2, 'novo intersticial é pré-carregado depois de fechar');
 
   console.log('# "Sem anúncios" (compra única)');
@@ -138,10 +138,10 @@ const BRIDGE = `
   await p.evaluate(() => localStorage.removeItem('tubo-certo-noads')); await p.reload(); await p.waitForTimeout(600);
   await p.click('#homeSettingsBtn'); await p.click('#settingRestoreRow'); await p.waitForTimeout(400);
   ok((await log()).includes('restore') && (await p.evaluate(() => localStorage.getItem('tubo-certo-noads'))) === '1', 'botão "Restaurar compras" restaura o item');
-  // com o item, a fase 3 não chama o intersticial
-  await p.evaluate(() => { localStorage.setItem('tubo-certo-levels', JSON.stringify({ unlocked: 6, stars: {} })); });
+  // com o item, a fase 6 não chama o intersticial
+  await p.evaluate(() => { localStorage.setItem('tubo-certo-levels', JSON.stringify({ unlocked: 9, stars: {} })); });
   await p.reload(); await p.waitForTimeout(700);
-  await p.click('#playBtn'); await p.locator('.level-tile:not(.locked)').nth(2).click(); await winCurrent();
+  await p.click('#playBtn'); await p.locator('.level-tile:not(.locked)').nth(5).click(); await winCurrent();
   await p.click('#winMainBtn'); await p.click('#winMainBtn'); await p.waitForTimeout(500);
   ok(!(await log()).includes('showInter'), 'com "Sem anúncios": showInterstitial não é chamado');
 

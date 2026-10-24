@@ -31,7 +31,7 @@ Sem esse parâmetro, as compras em dinheiro mostram um aviso de "pagamento indis
 | `fonts/` | Lilita One + Nunito (locais, funcionam offline) |
 | `referencias/` | Mockup e as 10 telas de referência |
 | `codigo/` | Backups do código anterior (`backup-pre-kit/` = arquivos antes da reformulação do gameplay) |
-| `tests/e2e.js` | Teste ponta a ponta com Playwright |
+| `tests/*.js` | Testes: `e2e.js` (jogo), `native-mock.js` (compras/anúncios com plugins simulados), `onboarding.js` (boas-vindas e tutorial), `levels.js` (gerador de fases) |
 | `js/config.js`, `js/platform.js` | IDs de produtos/anúncios e a camada de compras/anúncios (modos nativo, teste e web) |
 | `native/`, `js/native-bridge.js` | Ponte para os plugins nativos do Capacitor (gerada com `npm run build:bridge`) |
 | `android/`, `capacitor.config.json` | Projeto Android (abra com `npm run open:android`) |
@@ -54,6 +54,7 @@ No puzzle: seta = voltar às fases, raio = tela de reforços, cartão de moedas 
 - Vidas: máx. 5, 1 volta a cada 15 min. Também dá para trocar 80 moedas por 1 vida.
 - Reforços: desfazer (grátis), dica (50, usa o solver), tubo extra (100, máx. 2 por fase).
 - Baú de vitória: prêmio aleatório; sair sem abrir o baú credita o prêmio mesmo assim.
+- Primeira abertura: +150 moedas de presente; tutorial na fase 1 (2 jogadas guiadas, dá para pular); 1 dica grátis na primeira fase difícil. Jogadores que já tinham progresso não recebem. Anúncio entre fases só a partir da fase 6.
 - Progresso em `localStorage` (chaves `tubo-certo-*`). "Apagar progresso" em Configurações.
 
 ## Testes

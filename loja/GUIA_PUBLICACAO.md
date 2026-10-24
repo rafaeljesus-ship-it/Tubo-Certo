@@ -21,7 +21,7 @@ Siga a ordem abaixo e **teste no aparelho antes de publicar**.
    - `privacyUrl`: endereço público da política (ver passo 2).
    - `admob.real.rewarded`: ID do bloco de anúncio **Premiado** criado no AdMob.
    - `admob.real.interstitial`: ID do bloco **Intersticial** (o anúncio de tela cheia entre as fases).
-   - `ads.interstitial`: quando aparece o anúncio entre fases (hoje: ao concluir cada fase a partir da 3ª, com intervalo mínimo de 45 s; `everyLevels: 2` mostra a cada 2 fases; `enabled: false` desliga).
+   - `ads.interstitial`: quando aparece o anúncio entre fases (hoje: ao concluir cada fase a partir da 6ª, com intervalo mínimo de 45 s; `everyLevels: 2` mostra a cada 2 fases; `enabled: false` desliga).
    - `USE_TEST_ADS`: mude para `false` **só depois** de preencher o ID real. Com `true` aparecem anúncios de teste do Google (não pague nem clique em anúncios reais da própria conta: o AdMob suspende a conta por isso).
 2. `android/app/src/main/res/values/strings.xml`: `admob_app_id` = ID do **aplicativo** no AdMob (`ca-app-pub-…~…`). Hoje está o ID de teste do Google.
 3. `privacidade.html`: preencha seu nome/empresa, e-mail e data (os trechos amarelos tracejados).
@@ -93,7 +93,7 @@ Sugestão: ative o *Play App Signing* (a Google guarda a chave final).
 1. Instale o `.aab` por *Teste interno* (Play Console → Testes → Teste interno).
 2. Com conta de testador de licença: compre cada um dos 7 itens; confira que o item chega **uma vez** e que o preço aparece em R$.
 3. Cancele uma compra no meio: nada deve ser creditado.
-4. Assista a um anúncio premiado de teste até o fim (ganha) e feche antes (não ganha). Conclua a fase 3 e confira o intersticial de teste antes da fase 4; compre "Sem anúncios" e confira que ele some. Desinstale, reinstale e confira que "Sem anúncios" volta sozinho.
+4. Assista a um anúncio premiado de teste até o fim (ganha) e feche antes (não ganha). Conclua a fase 6 e confira o intersticial de teste antes da fase 7; compre "Sem anúncios" e confira que ele some. Desinstale, reinstale e confira que "Sem anúncios" volta sozinho.
 5. Desligue a internet e abra o jogo: deve funcionar; as compras avisam que a loja não respondeu.
 6. Em outro idioma/região (VPN) confirme o formulário de consentimento e o botão *Configurações → Privacidade dos anúncios*.
 

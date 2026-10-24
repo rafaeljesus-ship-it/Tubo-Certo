@@ -814,6 +814,22 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 .level-tile.tier-medium:not(.locked) { background: linear-gradient(180deg, #ffd7a0, #ffa63a 60%, #e57f12); }
 .level-tile[data-tag] .num { margin-top: 2.4cqw; }
 
+/* ==========================================================================
+   TUTORIAL (fase 1) e selo de dica grátis
+   ========================================================================== */
+.tut { position: absolute; inset: 0; z-index: 9; pointer-events: none; }
+.tut[hidden] { display: none; }
+.tut-bubble { position: absolute; left: 50%; transform: translateX(-50%); max-width: 84%; padding: 2.4cqw 4.4cqw; text-align: center; font: 400 4.6cqw/1.15 var(--display); letter-spacing: .01em; color: var(--ink); background: #fff7dc; border: 3px solid var(--ink); border-radius: 4cqw; box-shadow: 0 3px 0 var(--ink); }
+.tut-bubble.nudge { animation: nudge .35s ease; }
+@keyframes nudge { 20% { transform: translateX(calc(-50% - 7px)); } 40% { transform: translateX(calc(-50% + 7px)); } 60% { transform: translateX(calc(-50% - 4px)); } 80% { transform: translateX(calc(-50% + 4px)); } }
+.tut-hand { position: absolute; filter: drop-shadow(0 .6cqw 0 rgba(27, 17, 9, .35)); animation: tutPoke .8s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes tutPoke { 50% { transform: translateY(-9px); } }
+.tut-skip { position: absolute; right: 2cqw; bottom: 2cqw; pointer-events: auto; padding: 1.4cqw 3.4cqw; font: 400 3.2cqw/1 var(--display); letter-spacing: .04em; color: #fff; background: rgba(27, 17, 9, .78); border: 2px solid rgba(255, 238, 190, .6); border-radius: 999px; }
+.badge.free { min-width: 0; padding: 0 6px; background: var(--green); font-size: 10px; letter-spacing: .02em; right: -10px; }
+@media (prefers-reduced-motion: reduce) { .tut-hand, .tut-bubble.nudge { animation: none; } }
+.tut-bubble { white-space: nowrap; font-size: 3.9cqw; padding: 1.3cqw 4cqw; border-radius: 999px; }
+.toast.high { bottom: 34cqh; }
+
 </style>
 </head>
 <body>
@@ -933,9 +949,19 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
         <p class="board-hint" id="boardHint">Toque num tubo e depois em outro</p>
         <div class="board-rows" id="board"></div>
       </div>
-      <footer class="game-controls bench" id="gameBench">
+      <div class="tut" id="tut" hidden>
+      <div class="tut-bubble" id="tutText" role="status"></div>
+      <svg class="tut-hand" id="tutHand" viewBox="0 0 64 84" aria-hidden="true">
+        <path d="M32 84 V64" stroke="#1b1109" stroke-width="11" stroke-linecap="butt"/>
+        <path d="M20 40 Q10 38 8 48 Q6 62 18 66 H46 Q58 62 56 46 Q54 36 44 40 Z" fill="#fff" stroke="#1b1109" stroke-width="3.2" stroke-linejoin="round"/>
+        <rect x="23" y="3" width="18" height="46" rx="9" fill="#fff" stroke="#1b1109" stroke-width="3.2"/>
+        <path d="M27 52 V60 M32 52 V62 M37 52 V60" stroke="#1b1109" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6"/>
+      </svg>
+      <button class="tut-skip" id="tutSkip" type="button">PULAR</button>
+    </div>
+    <footer class="game-controls bench" id="gameBench">
       <button class="round-btn" id="undoBtn" type="button" aria-label="Desfazer movimento"><svg class="ico"><use href="#i-undo"/></svg><span class="badge" id="undoBadge">0</span></button>
-      <button class="round-btn" id="hintBtn" type="button" aria-label="Dica, 50 moedas"><svg class="ico"><use href="#i-bulb"/></svg><span class="badge">50</span></button>
+      <button class="round-btn" id="hintBtn" type="button" aria-label="Dica, 50 moedas"><svg class="ico"><use href="#i-bulb"/></svg><span class="badge" id="hintBadge">50</span></button>
       <button class="round-btn" id="extraTubeBtn" type="button" aria-label="Tubo extra, 100 moedas"><svg class="ico"><use href="#i-plus"/></svg><span class="badge">100</span></button>
       <button class="round-btn" id="restartBtn" type="button" aria-label="Reiniciar fase"><svg class="ico"><use href="#i-restart"/></svg></button>
       </footer>
@@ -1132,6 +1158,9 @@ window.TUBO_CONFIG = {
     // Compra única (não consumível): tira os anúncios entre fases; os anúncios opcionais de recompensa continuam.
     { id: 'sem_anuncios', kind: 'noads', nonConsumable: true, fallback: 'R$ 14,90' }
   ],
+  // Presentes para quem está começando (uma vez por instalação)
+  welcome: { coins: 150 },       // moedas na primeira abertura
+  hardGiftHints: 1,              // dicas grátis ao chegar na primeira fase difícil
   // Recompensas por anúncio
   ads: {
     lifeReward: 1,            // vidas por anúncio na tela de vidas
@@ -1139,7 +1168,7 @@ window.TUBO_CONFIG = {
     coinAdsPerDay: 5,         // limite diário de anúncios por moedas
     doubleChest: true,        // botão "dobrar prêmio" depois de abrir o baú
     // Anúncio de tela cheia ao concluir uma fase (some com a compra "Sem anúncios")
-    interstitial: { enabled: true, fromLevel: 3, everyLevels: 1, minGapMs: 45000 }
+    interstitial: { enabled: true, fromLevel: 6, everyLevels: 1, minGapMs: 45000 }
   }
 };
 
@@ -1654,8 +1683,9 @@ window.TUBO_CONFIG = {
   // ===================== Toast / modal =====================
   var toastEl = $('toast');
   var toastTimer = null;
-  function showToast(msg, ms) {
+  function showToast(msg, ms, high) {
     toastEl.textContent = msg;
+    toastEl.classList.toggle('high', !!high);
     toastEl.classList.add('show');
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, ms || 2300);
@@ -1754,6 +1784,75 @@ window.TUBO_CONFIG = {
     $('settingRestoreRow').hidden = Platform.mode !== 'native';
   }
 
+  // ===================== Boas-vindas, tutorial e presentes =====================
+  var ONB_KEY = 'tubo-certo-onboard';
+  var onb = store(ONB_KEY, null);
+  function saveOnb() { save(ONB_KEY, onb); }
+  // jogador que já tinha progresso antes desta versão não recebe presentes nem tutorial
+  function initOnboarding() {
+    if (onb) return null;
+    var existing = false;
+    try { existing = localStorage.getItem(COINS_KEY) !== null || localStorage.getItem(LEVELS_KEY) !== null; } catch (e) { /* sem storage */ }
+    onb = { welcome: true, hardGift: existing, freeHints: 0, tutorial: existing };
+    saveOnb();
+    return existing ? null : { coins: CFG.welcome.coins };
+  }
+  var TUT_ENABLED = Platform.mode !== 'test' || /[?&]tutorial=1/.test(location.search);
+  var tut = { active: false, pours: 0, closing: false };
+  var TUT_POURS = 2;
+  function tutNextMove() {
+    var path = E.solvePath(E.deepClone(state.tubes), 20000);
+    return path && path.length ? { from: path[0][0], to: path[0][1] } : null;
+  }
+  function tutShouldRun() { return TUT_ENABLED && onb && !onb.tutorial && state.level === 1 && currentView === 'game' && !state.won && !state.gate; }
+  function tutEnd(done) {
+    tut.active = false; tut.closing = false; $('tut').hidden = true;
+    if (done && !onb.tutorial) { onb.tutorial = true; saveOnb(); }
+  }
+  // a faixa de texto fica logo acima da borda de cima dos tubos (onde fica a dica discreta)
+  function tutTop(box) { var pn = $('boardPanel').getBoundingClientRect(), o = box.getBoundingClientRect(); return Math.round(pn.top - o.top + 4); }
+  function tutRender() {
+    var box = $('tut');
+    if (!tut.active || !tutShouldRun()) { if (tut.active && !tut.closing) { tut.active = false; } box.hidden = !tut.closing; if (!tut.closing) return; }
+    var text = $('tutText'), hand = $('tutHand');
+    if (tut.closing) { hand.style.display = 'none'; text.textContent = 'Muito bem! Agora é com você'; text.style.top = tutTop(box) + 'px'; box.hidden = false; return; }
+    var mv = tutNextMove();
+    if (!mv) { tutEnd(false); return; }
+    var target = state.selected === mv.from ? mv.to : mv.from;
+    text.textContent = state.selected === mv.from ? 'Agora toque aqui' : (tut.pours === 0 ? 'Toque neste tubo' : 'Isso! Toque neste tubo');
+    var el = board.querySelectorAll('.tube')[target];
+    if (!el) { box.hidden = true; return; }
+    box.hidden = false; hand.style.display = '';
+    var o = box.getBoundingClientRect(), r = el.getBoundingClientRect();
+    var hw = Math.max(44, Math.min(68, app.clientWidth * 0.155)), hh = hw * 84 / 64;
+    hand.style.width = hw + 'px'; hand.style.height = hh + 'px';
+    hand.style.left = Math.round(r.left - o.left + r.width / 2 - hw * 29 / 64) + 'px';
+    hand.style.top = Math.round(r.bottom - o.top - 4) + 'px';
+    text.style.top = tutTop(box) + 'px';
+  }
+  function tutStart() {
+    if (!tutShouldRun()) return;
+    tut.active = true; tut.pours = 0; tut.closing = false; state.tutHold = true;
+    tutRender();
+  }
+  function tutAfterPour() {
+    if (!tut.active) return;
+    tut.pours++;
+    if (tut.pours >= TUT_POURS) {
+      tut.closing = true; tutRender();
+      setTimeout(function () { tutEnd(true); }, 2600);
+    } else { tutRender(); }
+  }
+  // true = o toque não é o esperado agora (tutorial segura o jogador no caminho)
+  function tutBlocks(idx) {
+    if (!tut.active || tut.closing) return false;
+    var mv = tutNextMove(); if (!mv) return false;
+    var want = state.selected === mv.from ? mv.to : mv.from;
+    if (idx === want) return false;
+    sfxError(); var t = $('tutText'); t.classList.remove('nudge'); void t.offsetWidth; t.classList.add('nudge');
+    return true;
+  }
+
   // ===================== Moedas =====================
   function loadCoins() {
     try { return parseInt(localStorage.getItem(COINS_KEY) || '0', 10) || 0; } catch (e) { return 0; }
@@ -1850,6 +1949,7 @@ window.TUBO_CONFIG = {
     if (currentView === 'game' && name !== 'game') claimChest();
     views.forEach(function (v) { $('view-' + v).classList.toggle('active', v === name); });
     currentView = name;
+    if (name !== 'game' && tut.active) tutEnd(false);
     hideOverlays();
     syncCoinDisplays();
     if (name === 'levels') renderLevels();
@@ -2065,7 +2165,8 @@ window.TUBO_CONFIG = {
     if (path && path.length) move = { from: path[0][0], to: path[0][1] };
     else move = E.findHint(state.tubes);
     if (!move) { showToast('Nenhum movimento disponível agora.'); return false; }
-    if (!spendCoins(HINT_COST)) return false;
+    if (onb && onb.freeHints > 0) { onb.freeHints--; saveOnb(); updateHintBadge(); }
+    else if (!spendCoins(HINT_COST)) return false;
     state.selected = null;
     state.hint = move;
     render();
@@ -2073,6 +2174,13 @@ window.TUBO_CONFIG = {
     doHint.t = setTimeout(function () { state.hint = null; if (currentView === 'game') render(); }, 5000);
     showToast('Dica: toque no tubo que pulsa e depois no outro destacado.');
     return true;
+  }
+
+  function updateHintBadge() {
+    var free = onb && onb.freeHints > 0;
+    $('hintBadge').textContent = free ? 'GRÁTIS' : HINT_COST;
+    $('hintBadge').classList.toggle('free', !!free);
+    $('powerupsHintBtn').innerHTML = free ? '<span>GRÁTIS</span>' : '<svg class="ico coin"><use href="#i-coin"/></svg><span>' + HINT_COST + '</span>';
   }
 
   function doExtraTube() {
@@ -2162,11 +2270,19 @@ window.TUBO_CONFIG = {
   var board = $('board');
   var boardWrap = $('boardWrap');
 
+  function giftOnHardLevel() {
+    if (!onb || onb.hardGift || state.tier !== 'hard') return;
+    onb.hardGift = true; onb.freeHints += CFG.hardGiftHints; saveOnb(); updateHintBadge();
+    setTimeout(function () { showToast('Presente: ' + CFG.hardGiftHints + ' dica grátis para esta fase difícil! Toque na lâmpada.', 4200, true); }, 400);
+  }
+
   function startLevel(n) {
     syncLives();
     newLevel(n);
     showView('game');
-    if (state.lives <= 0) { state.gate = 'nolives'; openFail(); }
+    if (state.lives <= 0) { state.gate = 'nolives'; openFail(); return; }
+    giftOnHardLevel();
+    tutStart();
   }
 
   function newLevel(level) {
@@ -2194,6 +2310,7 @@ window.TUBO_CONFIG = {
     state.hint = null;
     state.gate = null;
     state.pendingReward = null;
+    if (tut.active) { tut.pours = 0; tut.closing = false; }
     if (currentView === 'game') { hideOverlays(); render(); }
   }
 
@@ -2221,6 +2338,7 @@ window.TUBO_CONFIG = {
 
   function handleTubeClick(idx) {
     if (state.won || state.gate) return;
+    if (tutBlocks(idx)) return;
     state.hint = null;
     var tubes = state.tubes;
     if (state.selected === null) {
@@ -2239,6 +2357,7 @@ window.TUBO_CONFIG = {
       state.lastPourTo = idx;
       var closed = E.tubeStatus(tubes[idx]) === 'solved';
       render();
+      tutAfterPour();
       vibrate(closed ? 25 : 12);
       if (E.isSolved(tubes)) {
         onWin();
@@ -2327,7 +2446,7 @@ window.TUBO_CONFIG = {
         rows[Math.min(L.r - 1, Math.floor(idx / per))].appendChild(el);
       });
     }
-    $('boardHint').classList.toggle('gone', state.moves > 0 || state.selected !== null);
+    $('boardHint').classList.toggle('gone', state.moves > 0 || state.selected !== null || tut.active);
     $('levelValue').textContent = state.level;
     $('movesValue').textContent = state.moves;
     $('undoBtn').disabled = !levelInProgress() || state.history.length === 0;
@@ -2342,6 +2461,7 @@ window.TUBO_CONFIG = {
     renderLives();
     syncCoinDisplays();
     state.lastPourTo = null;
+    if (tut.active) tutRender();
   }
   if (window.ResizeObserver) new ResizeObserver(function () { if (currentView === 'game') render(); }).observe(boardWrap);
 
@@ -2393,6 +2513,7 @@ window.TUBO_CONFIG = {
   }
 
   function onWin() {
+    if (tut.active) tutEnd(true);
     state.won = true;
     state.hint = null;
     saveBest(state.colors, state.moves);
@@ -2571,6 +2692,7 @@ window.TUBO_CONFIG = {
   on('settingAdsRow', function () {
     Platform.privacyOptions().then(function (ok) { if (!ok) showToast('Nenhuma opção de privacidade disponível para a sua região.'); });
   });
+  $('tutSkip').addEventListener('click', function () { sfxClick(); tutEnd(true); render(); });
   on('settingResetRow', function () {
     openModal('Apagar progresso?', '<p>Isso zera moedas, vidas, estrelas e recordes deste aparelho. Não dá para desfazer.</p>', [
       { label: 'APAGAR', cls: 'danger', onClick: function () {
@@ -2620,8 +2742,14 @@ window.TUBO_CONFIG = {
     syncCoinDisplays();
     showView('home');
 
+    var welcome = initOnboarding();
+    if (welcome) addCoins(welcome.coins);
+    updateHintBadge();
     var info = checkDailyStreak();
-    if (info) {
+    if (welcome) {
+      $('streakText').textContent = 'Bem-vindo! Presente: +' + welcome.coins + ' moedas';
+      $('streakBanner').hidden = false;
+    } else if (info) {
       var txt = 'Sequência de ' + info.count + (info.count === 1 ? ' dia' : ' dias') + '! +' + info.bonus + ' moedas';
       $('streakText').textContent = txt;
       $('streakBanner').hidden = false;
