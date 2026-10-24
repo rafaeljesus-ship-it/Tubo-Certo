@@ -65,6 +65,9 @@ NODE_PATH=$(npm root -g) node tests/e2e.js /pasta/das/capturas
 
 ## Gameplay (kit de assets)
 
+Os SVGs de `tubo_certo_assets/adaptados/` (vidro, selecionado, completo, movimento válido) são adaptações dos originais do kit: mesma proporção 140×380, contorno mais fino, aro metálico e estados novos. Os originais ficam intactos em `tubo_certo_assets/tubes/`.
+
+
 Cada tubo é um `<button>` com camadas independentes: segmentos coloridos (SVG `<use>` da paleta do kit), `tube-glass-overlay.svg` por cima,
 `tube-selected-overlay.svg` (selecionado) e `tube-complete-overlay.svg` (completo). `tube-locked-overlay.svg` está no kit, mas o jogo não tem tubo bloqueado, então não é usado.
 O layout (`layoutFor` em `js/game.js`) mede a área de jogo real e escolhe 1–3 fileiras para maximizar o tamanho dos tubos.

@@ -72,6 +72,11 @@ async function coins(p) { return +(await p.textContent('#view-home [data-coins],
   const t1 = JSON.stringify(await readTubes(p));
   await p.click('#restartBtn'); ok(JSON.stringify(await readTubes(p)) === t1, 'reiniciar volta ao mesmo tabuleiro inicial');
 
+  // estados visuais do kit
+  await p.locator('#board .tube').nth(0).click();
+  ok((await p.locator('#board .tube.selected').count()) === 1 && (await p.locator('#board .tube.valid').count()) >= 1, 'tubo selecionado mostra destinos válidos (estado do kit)');
+  ok((await p.locator('#board .tube.selected img.st-sel').count()) === 1 && (await p.locator('#board .tube img.glass-layer').count()) === 5, 'cada tubo usa o SVG de vidro do kit');
+  await p.locator('#board .tube').nth(0).click();
   console.log('# reforços');
   const c0 = +(await p.textContent('#view-game [data-coins]'));
   await p.click('#hintBtn'); await p.waitForTimeout(200);
@@ -105,7 +110,7 @@ async function coins(p) { return +(await p.textContent('#view-home [data-coins],
   console.log('# derrota');
   await p.locator('.level-tile:not(.locked)').nth(1).click();
   const lim = await p.evaluate(() => +document.getElementById('progressLabel').textContent.split('LIMITE ')[1]);
-  const vidas0 = +(await p.textContent('#gameLivesNum'));
+  const vidas0 = await p.locator('#gameLivesBtn .heart.full').count();
   for (let i = 0; i < lim + 3; i++) {
     if (await p.isVisible('#view-fail')) break;
     const t = await readTubes(p);
@@ -119,7 +124,7 @@ async function coins(p) { return +(await p.textContent('#view-home [data-coins],
   }
   await p.waitForTimeout(400);
   ok(await p.isVisible('#view-fail'), 'tela de derrota aparece ao passar do limite'); await shot('05_derrota');
-  ok(+(await p.textContent('#gameLivesNum')) === vidas0 - 1, 'derrota consome 1 vida');
+  ok((await p.locator('#gameLivesBtn .heart.full').count()) === vidas0 - 1, 'derrota consome 1 vida');
   await p.click('#failMainBtn'); await p.waitForTimeout(300);
   ok(!(await p.isVisible('#view-fail')) && (await p.textContent('#movesValue')) === '0', 'TENTAR DE NOVO reinicia a fase');
 

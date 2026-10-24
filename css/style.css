@@ -208,72 +208,68 @@ button.coin-pill { cursor: pointer; }
 .dots button { width: 3.4cqw; height: 3.4cqw; padding: 0; border: 0; border-radius: 50%; background: #f1e8d2; opacity: .85; }
 .dots button.active { background: var(--yellow); box-shadow: 0 0 0 1.5px var(--ink); }
 
-/* ---------- 3. puzzle (reformulado: HUD compacto, painel que abraça os tubos, kit de assets) ---------- */
+/* ---------- 3. puzzle: mesma linguagem da tela inicial (contorno 3-4px, cantos 3-5cqw, sombra única) ---------- */
 #view-game { padding-bottom: max(2cqw, env(safe-area-inset-bottom)); }
-#view-game .scene { filter: blur(2.5px) saturate(.7) brightness(.62); transform: scale(1.04); }
-#view-game .scene-shade { background: linear-gradient(180deg, rgba(20, 12, 6, .55), rgba(20, 12, 6, .35) 40%, rgba(20, 12, 6, .6)); }
+#view-game .scene { filter: blur(2.5px) saturate(.7) brightness(.6); transform: scale(1.04); }
+#view-game .scene-shade { background: linear-gradient(180deg, rgba(20, 12, 6, .5), rgba(20, 12, 6, .3) 40%, rgba(20, 12, 6, .55)); }
 
-/* 3º nível de atenção: nível/moedas/vidas numa faixa fina */
-.hud { position: relative; z-index: 2; display: flex; align-items: center; gap: 2cqw; padding: max(2.6cqw, env(safe-area-inset-top)) 3cqw 0; }
-.hud-nav { display: flex; gap: 1.4cqw; flex: none; }
-.hud-level { display: flex; align-items: baseline; gap: 1.6cqw; padding: .7cqw 3.4cqw .9cqw; color: #fff; background: linear-gradient(180deg, #3a79d8, var(--blue-dark)); border: 3px solid var(--ink); border-radius: 999px; box-shadow: 0 2px 0 var(--ink); }
-.hud-level .lbl { font: 400 3cqw/1 var(--display); letter-spacing: .05em; color: #cfe3ff; }
-.hud-level b { font: 400 6.4cqw/1 var(--display); -webkit-text-stroke: .03em var(--ink); paint-order: stroke fill; }
-.hud-sp { flex: 1; }
-.hud-chip { display: inline-flex; align-items: center; gap: 1.2cqw; height: 8.4cqw; padding: 0 2.2cqw 0 1.2cqw; color: #fff; font: 400 4.6cqw/1 var(--display); background: rgba(27, 17, 9, .78); border: 2.5px solid rgba(255, 238, 190, .55); border-radius: 999px; }
-.hud-chip .ico.coin { width: 6cqw; height: 6cqw; }
-.hud-chip .plus { display: grid; place-items: center; width: 5cqw; height: 5cqw; border-radius: 50%; background: var(--green); color: #fff; font-style: normal; }
-.hud-chip .plus .ico { width: 62%; height: 62%; }
-.hud-chip b { font-weight: 400; font-variant-numeric: tabular-nums; }
-.hud-chip.lives .heart { width: 5.2cqw; height: 5.2cqw; stroke-width: 2px; }
+.hud { position: relative; z-index: 2; display: grid; grid-template-columns: auto 1fr 1.3fr 1.55fr; gap: 1.8cqw; align-items: stretch; padding: max(2.6cqw, env(safe-area-inset-top)) 3cqw 0; }
+.hud-nav { display: flex; flex-direction: column; justify-content: space-between; gap: 1.2cqw; }
+.hud-card, .hud-wallet { border: 3px solid var(--ink); border-radius: 3.2cqw; box-shadow: 0 3px 0 var(--ink), inset 0 2px 0 rgba(255, 255, 255, .25); min-width: 0; }
+.hud-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1cqw .6cqw .8cqw; color: #fff; background: linear-gradient(180deg, #3b7ad8, var(--blue-dark)); }
+.hud-label { font: 400 2.7cqw/1 var(--display); letter-spacing: .05em; color: #cfe3ff; white-space: nowrap; }
+.hud-value { font: 400 8.6cqw/1 var(--display); -webkit-text-stroke: .03em var(--ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
+.hud-wallet { display: flex; flex-direction: column; justify-content: center; gap: .8cqw; padding: 1.2cqw 1.8cqw; background: linear-gradient(180deg, #3a2412, #1b1109); }
+.wallet-coins { display: flex; align-items: center; gap: 1.2cqw; padding: 0; background: none; border: 0; color: #fff; font: 400 5cqw/1 var(--display); }
+.wallet-coins .ico.coin { width: 6.2cqw; height: 6.2cqw; }
+.wallet-coins b { flex: 1; text-align: left; font-weight: 400; font-variant-numeric: tabular-nums; }
+.wallet-coins .plus { display: grid; place-items: center; width: 5.4cqw; height: 5.4cqw; border-radius: 50%; background: var(--green); border: 2px solid var(--ink); color: #fff; font-style: normal; }
+.wallet-coins .plus .ico { width: 62%; height: 62%; }
+.heart { stroke: var(--ink); stroke-width: 2.4px; stroke-linejoin: round; paint-order: stroke; }
+.heart.full { color: #ff3b2a; }
+.heart.empty { color: #5d4d3b; }
+.wallet-lives { display: flex; justify-content: space-between; gap: 2px; width: 100%; padding: 0; background: none; border: 0; }
+.wallet-lives .heart { flex: 1 1 0; min-width: 0; width: auto; height: auto; aspect-ratio: 1; max-width: 5cqw; stroke-width: 2px; }
 
-/* 2º nível: movimentos e progresso */
-.meta-row { position: relative; z-index: 2; display: flex; align-items: center; gap: 2.4cqw; padding: 2.4cqw 4cqw 0; color: #fff; }
-.moves { flex: none; display: flex; align-items: baseline; gap: 1.2cqw; font: 400 3.2cqw/1 var(--display); letter-spacing: .04em; color: #ffe7a8; }
-.moves b { font-size: 6.2cqw; color: #fff; font-weight: 400; font-variant-numeric: tabular-nums; }
-.meta-track { position: relative; flex: 1; height: 2.8cqw; background: rgba(0, 0, 0, .45); border: 2px solid rgba(255, 238, 190, .6); border-radius: 999px; overflow: hidden; }
+.meta-row { position: relative; z-index: 2; display: flex; align-items: center; gap: 2.4cqw; padding: 2.2cqw 4cqw 0; }
+.meta-track { position: relative; flex: 1; height: 2.6cqw; background: rgba(0, 0, 0, .45); border: 2px solid rgba(255, 238, 190, .6); border-radius: 999px; overflow: hidden; }
 .meta-fill { height: 100%; width: 0; background: linear-gradient(180deg, #7fe08f, var(--green)); transition: width .25s ease, background .25s; }
 .meta-fill.warn { background: linear-gradient(180deg, #ffd94f, var(--yellow)); }
 .meta-fill.over { background: linear-gradient(180deg, #ff7a5f, var(--red)); }
 .meta-mark { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; opacity: .9; }
-.meta-text { flex: none; font: 800 2.9cqw/1.1 var(--body); color: #ffe7a8; text-align: right; white-space: nowrap; }
+.meta-text { flex: none; font: 800 2.9cqw/1.1 var(--body); color: #ffe7a8; white-space: nowrap; }
 
-/* 1º nível: tubos. A área de jogo ocupa o centro; o painel creme abraça os tubos */
-.play-area { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 2.4cqw 3cqw; }
-.board { position: relative; display: flex; flex-direction: column; align-items: center; padding: var(--padY, 14px) var(--pad, 14px); background: var(--paper), linear-gradient(180deg, #fbf1d6, #f1dfae); border: 3px solid var(--ink); border-radius: 5cqw; box-shadow: 0 5px 0 rgba(0, 0, 0, .45); }
-.board-hint { position: absolute; z-index: 6; top: -3.6cqw; left: 50%; transform: translateX(-50%); margin: 0; padding: 1cqw 3.2cqw; white-space: nowrap; font: 800 3.1cqw/1 var(--body); color: var(--ink); background: #ffe7a8; border: 2.5px solid var(--ink); border-radius: 999px; transition: opacity .3s; pointer-events: none; }
+/* área de jogo: painel creme leve, sem prateleiras, sem moldura pesada */
+.play-area { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 3.4cqw 3cqw 2cqw; }
+.board { position: relative; display: flex; flex-direction: column; align-items: center; padding: var(--padY, 12px) var(--pad, 12px); background: var(--paper), linear-gradient(180deg, rgba(252, 243, 220, .96), rgba(244, 226, 183, .96)); border: 3px solid var(--ink); border-radius: 5cqw; box-shadow: 0 3px 0 rgba(0, 0, 0, .4); }
+.board-hint { position: absolute; z-index: 6; bottom: -3.4cqw; left: 50%; transform: translateX(-50%); margin: 0; padding: 1cqw 3.2cqw; white-space: nowrap; font: 800 3.1cqw/1 var(--body); color: var(--ink); background: #ffe7a8; border: 2.5px solid var(--ink); border-radius: 999px; transition: opacity .3s; pointer-events: none; }
 .board-hint.gone { opacity: 0; }
-.board-rows { display: flex; flex-direction: column; align-items: center; gap: var(--rowgap, 14px); }
-.tube-row { position: relative; display: flex; justify-content: center; align-items: flex-end; gap: var(--tgap, 10px); padding-bottom: var(--shelf, 6px); }
-.tube-row::after { /* prateleira: um traço só, sem ornamento */
-  content: ''; position: absolute; left: -2%; right: -2%; bottom: 0; height: var(--shelf, 8px); z-index: 0;
-  background: linear-gradient(180deg, var(--wood), var(--wood-2)); border: 2.5px solid var(--ink); border-radius: 4px;
-}
+.board-rows { display: flex; flex-direction: column; align-items: center; gap: var(--rowgap, 4px); }
+.tube-row { display: flex; justify-content: center; align-items: flex-end; gap: var(--tgap, 4px); }
 
-/* tubo = camadas independentes: segmentos (HTML) + vidro/estados (SVG do kit) */
-.tube { position: relative; z-index: 1; flex: none; width: var(--tw, 60px); height: calc(var(--tw, 60px) * 2.714); padding: 0; border: 0; background: none; cursor: pointer; transition: transform .16s cubic-bezier(.3, 1.6, .5, 1); -webkit-tap-highlight-color: transparent; }
+/* tubo = camadas independentes: peças (HTML/SVG) + vidro e estados (SVG do kit adaptado) */
+.tube { position: relative; flex: none; width: var(--tw, 60px); height: calc(var(--tw, 60px) * 2.714); padding: 0; border: 0; background: none; cursor: pointer; transition: transform .16s cubic-bezier(.3, 1.6, .5, 1); }
 .tube:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 12px; }
 .tube > img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none; }
-.tube .st-sel, .tube .st-done { opacity: 0; transition: opacity .15s; z-index: 4; }
-.tube.selected .st-sel { opacity: 1; }
-.tube.solved .st-done { opacity: 1; }
 .tube .glass-layer { z-index: 3; }
-.layers { position: absolute; z-index: 2; left: 22.8%; right: 22.8%; top: 12.4%; bottom: 10.6%; display: flex; flex-direction: column-reverse; gap: 1.2%; }
-.seg { flex: none; width: 100%; height: calc((100% - 3.6%) / 4); display: block; overflow: visible; }
+.tube .st-sel, .tube .st-valid, .tube .st-done { opacity: 0; transition: opacity .15s; z-index: 4; }
+.tube.selected .st-sel, .tube.valid .st-valid, .tube.solved .st-done { opacity: 1; }
+.tube.valid .st-valid { animation: validPulse 1s ease-in-out infinite; }
+@keyframes validPulse { 50% { opacity: .55; } }
+.layers { position: absolute; z-index: 2; left: 21.8%; right: 21.8%; top: 11.6%; bottom: 9.8%; display: flex; flex-direction: column-reverse; gap: .5%; }
+.seg { flex: none; width: 100%; height: calc((100% - 1.5%) / 4); display: block; overflow: visible; }
 .seg.just-dropped { animation: segDrop .3s ease; }
-@keyframes segDrop { 0% { transform: translateY(-30%) scaleY(.7); } 60% { transform: scaleY(1.08); } 100% { transform: none; } }
-.tube.selected { transform: translateY(-5%); }
-.tube.solved { animation: doneGlow 1.8s ease-in-out infinite; }
-@keyframes doneGlow { 50% { filter: drop-shadow(0 0 6px rgba(255, 200, 40, .85)); } }
-.tube.solved::after { content: ''; position: absolute; z-index: 6; left: 50%; top: -3%; width: 26%; aspect-ratio: 1; margin-left: -13%; background: #fff7b0; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 1.6s ease-in-out infinite; }
-.tube.hint { animation: hintBounce .55s ease-in-out infinite alternate; filter: drop-shadow(0 0 6px var(--red)); }
-@keyframes hintBounce { to { transform: translateY(-5%); } }
+@keyframes segDrop { 0% { transform: translateY(-30%) scaleY(.7); } 60% { transform: scaleY(1.06); } 100% { transform: none; } }
+.tube.selected { transform: translateY(-4%); }
+.tube.solved { animation: doneGlow 2s ease-in-out infinite; }
+@keyframes doneGlow { 50% { filter: drop-shadow(0 0 5px rgba(255, 200, 40, .8)); } }
+.tube.hint { animation: hintBounce .55s ease-in-out infinite alternate; filter: drop-shadow(0 0 5px var(--red)); }
+@keyframes hintBounce { to { transform: translateY(-4%); } }
 
-/* 4º nível: ferramentas — menores e mais discretas */
-.game-controls { position: relative; z-index: 2; display: flex; justify-content: center; gap: 4.4cqw; padding: 2.4cqw 4cqw 1cqw; }
-.game-controls .round-btn { --sz: clamp(44px, 12.6cqw, 62px); border-width: 3px; box-shadow: inset 0 -3px 0 rgba(120, 70, 0, .2), 0 3px 0 rgba(0, 0, 0, .6); }
-.game-controls .round-btn::before { display: none; }
-.game-controls .badge { top: -6px; right: -6px; min-width: 21px; height: 21px; font-size: 11px; border-width: 2px; }
+/* ferramentas: exatamente os botões redondos da tela inicial */
+.game-controls { position: relative; z-index: 2; display: flex; justify-content: center; gap: 5cqw; padding: 2.6cqw 4cqw 1.4cqw; }
+.game-controls .round-btn { --sz: clamp(48px, 14.4cqw, 68px); }
+.game-controls .badge { top: -7px; right: -7px; }
 
 /* ---------- telas de papel (loja, vidas, reforços, config, ranking) ---------- */
 .paper-screen { background: #2b1a0c url('../assets/cenario-oficina.jpg') center 80% / cover; }

@@ -11,7 +11,7 @@
   // Paleta do kit (tubo_certo_assets/blocks): a ordem é a do índice de cor do motor.
   var COLOR_NAMES = ['red', 'yellow', 'blue', 'green', 'purple', 'orange', 'pink', 'cyan', 'lime', 'gray'];
   var BALL_COLORS = ['#e5321f', '#ffcf1f', '#2d68c9', '#1fb98a', '#8e44c2', '#ff8a1c', '#ff6fa6', '#19bfd0', '#8fd02a', '#a9aca9']; // confete
-  var KIT = 'tubo_certo_assets/';
+  var KIT = 'tubo_certo_assets/adaptados/';
 
   var TEST_MODE = /[?&]teste=1/.test(location.search);
 
@@ -212,7 +212,7 @@
   }
   function renderLives() {
     var b = $('gameLivesBtn');
-    b.innerHTML = ico('heart', 'heart full') + '<b id="gameLivesNum">' + state.lives + '</b>';
+    b.innerHTML = heartsHtml(state.lives, MAX_LIVES);
     b.setAttribute('aria-label', 'Vidas: ' + state.lives + ' de ' + MAX_LIVES);
     $('failLivesBadge').textContent = state.lives;
   }
@@ -573,14 +573,14 @@
     var W = area.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     var H = area.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
     if (W <= 0 || H <= 0) return null;
-    var pad = Math.max(10, Math.round(W * 0.035));
+    var pad = Math.max(8, Math.round(W * 0.03));
     var maxTw = Math.min(W * 0.31, 120);
     var best = null;
     for (var r = 1; r <= 3; r++) {
       var per = Math.ceil(n / r);
-      var gap = Math.max(2, Math.round(W * 0.012));
-      var rowGap = Math.round(W * 0.012) + 4;
-      var shelf = Math.max(6, Math.round(W * 0.02));
+      var gap = Math.max(2, Math.round(W * 0.01));
+      var rowGap = Math.round(W * 0.008);
+      var shelf = 0;
       var twW = (W - 2 * pad - 6 - (per - 1) * gap) / per;
       var twH = ((H - 2 * pad - 6 - (r - 1) * rowGap) / r - shelf) / TUBE_ASPECT;
       var tw = Math.floor(Math.min(twW, twH, maxTw));
@@ -596,7 +596,7 @@
   }
 
   function segSvg(c, dropped) {
-    return '<svg class="seg' + (dropped ? ' just-dropped' : '') + '" viewBox="0 0 84 64" preserveAspectRatio="none" data-c="' + c + '" aria-hidden="true"><use href="#seg-' + COLOR_NAMES[c] + '"/></svg>';
+    return '<svg class="seg' + (dropped ? ' just-dropped' : '') + '" viewBox="0 0 84 84" preserveAspectRatio="none" data-c="' + c + '" aria-hidden="true"><use href="#seg-' + COLOR_NAMES[c] + '"/></svg>';
   }
 
   function render() {
@@ -621,6 +621,7 @@
         var cls = ['tube'];
         if (state.selected === idx) cls.push('selected');
         if (status) cls.push(status);
+        if (state.selected !== null && state.selected !== idx && E.canPour(state.tubes, state.selected, idx)) cls.push('valid');
         if (state.hint && (state.hint.from === idx || state.hint.to === idx)) cls.push('hint');
         el.className = cls.join(' ');
         el.setAttribute('aria-label', 'Tubo ' + (idx + 1) + ', ' + tube.length + ' de ' + CAP + ' cheio' + (state.selected === idx ? ', selecionado' : ''));
@@ -628,9 +629,10 @@
         tube.forEach(function (c, bi) { layers += segSvg(c, idx === state.lastPourTo && bi === tube.length - 1); });
         layers += '</div>';
         el.innerHTML = layers +
-          '<img class="glass-layer" src="' + KIT + 'tubes/tube-glass-overlay.svg" alt="" draggable="false">' +
-          '<img class="st-sel" src="' + KIT + 'tubes/tube-selected-overlay.svg" alt="" draggable="false">' +
-          '<img class="st-done" src="' + KIT + 'tubes/tube-complete-overlay.svg" alt="" draggable="false">';
+          '<img class="glass-layer" src="' + KIT + 'tube-glass.svg" alt="" draggable="false">' +
+          '<img class="st-sel" src="' + KIT + 'tube-selected.svg" alt="" draggable="false">' +
+          '<img class="st-valid" src="' + KIT + 'tube-valid.svg" alt="" draggable="false">' +
+          '<img class="st-done" src="' + KIT + 'tube-complete.svg" alt="" draggable="false">';
         el.addEventListener('click', function () { handleTubeClick(idx); });
         rows[Math.min(L.r - 1, Math.floor(idx / per))].appendChild(el);
       });
@@ -889,7 +891,7 @@
 
   // ===================== Início =====================
   function start() {
-    ['tube-glass-overlay', 'tube-selected-overlay', 'tube-complete-overlay'].forEach(function (n) { new Image().src = KIT + 'tubes/' + n + '.svg'; });
+    ['tube-glass', 'tube-selected', 'tube-valid', 'tube-complete'].forEach(function (n) { new Image().src = KIT + n + '.svg'; });
     state.coins = loadCoins();
     syncLives();
     renderLives();
