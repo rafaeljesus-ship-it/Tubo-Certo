@@ -80,7 +80,6 @@
       <div class="round-row">
         <button class="round-btn" id="homeSettingsBtn" type="button" aria-label="Configurações"><svg class="ico"><use href="#i-gear"/></svg></button>
         <button class="round-btn" id="homeShopBtn" type="button" aria-label="Loja de moedas"><svg class="ico"><use href="#i-cart"/></svg></button>
-        <button class="round-btn" id="homeRankingBtn" type="button" aria-label="Ranking"><svg class="ico"><use href="#i-trophy"/></svg></button>
       </div>
     </div>
   </section>
@@ -142,7 +141,7 @@
       <div class="coin-pill dark"><svg class="ico coin"><use href="#i-coin"/></svg><b data-coins>0</b></div>
     </header>
     <div class="scroll"><div class="row-list" id="shopList"></div>
-      <p class="fine" id="shopNote">Pagamentos reais ainda não estão integrados nesta versão: nenhuma cobrança é feita.</p>
+      <p class="fine" id="shopNote"></p>
     </div>
   </section>
 
@@ -160,9 +159,10 @@
       <div class="row-list">
         <div class="pink-row"><span class="pr-title"><svg class="ico heart"><use href="#i-heart"/></svg>+1 VIDA</span><button class="buy-btn" id="livesBuyOneBtn" type="button">R$ 2,90</button></div>
         <div class="pink-row"><span class="pr-title"><svg class="ico heart"><use href="#i-heart"/></svg><svg class="ico heart"><use href="#i-heart"/></svg>+5 VIDAS</span><button class="buy-btn" id="livesBuyFiveBtn" type="button">R$ 9,90</button></div>
+        <div class="paper-row" id="livesAdRow"><span class="pr-title"><svg class="ico play-ico"><use href="#i-play"/></svg><span class="pr-stack"><span>+1 VIDA</span><small>assistindo um anúncio</small></span></span><button class="buy-btn" id="livesAdBtn" type="button">GRÁTIS</button></div>
         <div class="paper-row"><span class="pr-title"><svg class="ico heart"><use href="#i-heart"/></svg><span class="pr-stack"><span>+1 VIDA</span><small>com moedas</small></span></span><button class="buy-btn" id="livesCoinBuyBtn" type="button"><svg class="ico coin"><use href="#i-coin"/></svg><span id="lifeCoinCost">80</span></button></div>
       </div>
-      <p class="fine">Cada vida volta sozinha a cada 15 minutos. Compras em R$ ainda não estão integradas; trocar por moedas já funciona.</p>
+      <p class="fine" id="livesNote">Cada vida volta sozinha a cada 15 minutos.</p>
     </div>
   </section>
 
@@ -200,6 +200,7 @@
         <div class="set-row static"><svg class="ico"><use href="#i-globe"/></svg><span>Idioma</span><em>Português</em></div>
         <button class="set-row" id="settingHelpRow" type="button"><svg class="ico"><use href="#i-help"/></svg><span>Ajuda</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
         <button class="set-row" id="settingPrivacyRow" type="button"><svg class="ico"><use href="#i-shield"/></svg><span>Política de Privacidade</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
+        <button class="set-row" id="settingAdsRow" type="button" hidden><svg class="ico"><use href="#i-shield"/></svg><span>Privacidade dos anúncios</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
         <button class="set-row danger" id="settingResetRow" type="button"><svg class="ico"><use href="#i-trash"/></svg><span>Apagar progresso</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
       </div>
       <p class="fine" id="settingsNote"></p>
@@ -240,6 +241,7 @@
         <span class="reward-tag" id="rewardTag">VOCÊ GANHOU</span>
         <div class="reward-line" id="rewardLine"><img class="chest" src="assets/personagens/bau.png" alt=""><span class="reward-hint" id="rewardHint">Abra o baú</span></div>
       </div>
+      <button class="double-btn" id="doubleBtn" type="button" hidden><svg class="ico"><use href="#i-play"/></svg><span>DOBRAR PRÊMIO <small>assistindo um anúncio</small></span></button>
       <button class="btn-big green" id="winMainBtn" type="button"><span id="winMainLabel">ABRIR BAÚ</span></button>
       <div class="round-row">
         <button class="round-btn" id="winHomeBtn" type="button" aria-label="Início"><svg class="ico"><use href="#i-home"/></svg></button>
@@ -292,6 +294,8 @@
 </div>
 </div>
 
+<script src="js/config.js"></script>
+<script src="js/platform.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/game.js"></script>
 </body>

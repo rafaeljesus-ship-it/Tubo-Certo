@@ -299,8 +299,10 @@
       var stars = levelData.stars[n] || 0;
       var tile = document.createElement('button');
       tile.type = 'button';
-      tile.className = 'level-tile' + (locked ? ' locked' : '') + (n === levelData.unlocked ? ' current' : '');
-      tile.setAttribute('aria-label', locked ? 'Fase ' + n + ' bloqueada' : 'Fase ' + n + ', ' + stars + ' de 3 estrelas');
+      var spec = E.levelSpec(n);
+      tile.className = 'level-tile tier-' + spec.tier + (locked ? ' locked' : '') + (n === levelData.unlocked ? ' current' : '');
+      if (spec.tier !== 'easy') tile.setAttribute('data-tag', spec.label);
+      tile.setAttribute('aria-label', locked ? 'Fase ' + n + ' bloqueada' : 'Fase ' + n + ', dificuldade ' + spec.label.toLowerCase() + ', ' + stars + ' de 3 estrelas');
       if (locked) {
         tile.disabled = true;
         tile.innerHTML = '<span class="num">' + n + '</span>' + ico('lock', 'lock');
@@ -563,12 +565,14 @@
 
   function newLevel(level) {
     state.level = level;
-    state.colors = E.colorsForLevel(level);
-    var g = E.generateLevel(state.colors);
+    var g = E.generateForLevel(level);
+    state.colors = g.spec.colors;
+    state.tier = g.spec.tier;
+    state.tierLabel = g.spec.label;
     state.initial = E.deepClone(g.tubes);
     state.optimal = g.optimal;
-    state.target = E.targetFromOptimal(g.optimal);
-    state.baseHardLimit = E.hardLimitFromOptimal(g.optimal);
+    state.target = g.target;
+    state.baseHardLimit = g.hardLimit;
     resetBoard();
   }
 
@@ -728,7 +732,7 @@
     fill.style.width = Math.min(100, state.moves / limit * 100) + '%';
     fill.className = 'meta-fill' + (state.moves > state.target ? (state.moves > state.target + (limit - state.target) / 2 ? ' over' : ' warn') : '');
     $('metaMark').style.left = (state.target / limit * 100) + '%';
-    $('progressLabel').textContent = 'META ' + state.target + ' · LIMITE ' + limit;
+    $('progressLabel').textContent = (state.tierLabel ? state.tierLabel + ' · ' : '') + 'META ' + state.target + ' · LIMITE ' + limit;
     renderLives();
     syncCoinDisplays();
     state.lastPourTo = null;

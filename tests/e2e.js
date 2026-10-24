@@ -109,6 +109,37 @@ async function coins(p) { return +(await p.textContent('#view-home [data-coins],
   ok((await p.locator('.level-tile:not(.locked)').count()) === 2, 'fase 2 liberada no mapa');
   ok((await p.locator('.level-tile').first().locator('.ico.on').count()) >= 1, 'estrelas salvas na fase 1');
 
+  console.log('# anúncio entre fases');
+  await p.evaluate(() => localStorage.setItem('tubo-certo-levels', JSON.stringify({ unlocked: 6, stars: {} })));
+  async function winCurrent() { const t = await readTubes(p); const path = await p.evaluate(t => window.TuboEngine.solvePath(t, 60000), t);
+    for (const [a, b] of path) { await p.locator('#board .tube').nth(a).click(); await p.locator('#board .tube').nth(b).click(); } await p.waitForTimeout(900); }
+  await p.locator('.level-tile:not(.locked)').nth(1).click(); await winCurrent();           // fase 2: antes da 3ª, sem anúncio
+  await p.click('#winMainBtn'); await p.click('#winMainBtn'); await p.waitForTimeout(500);
+  ok((await p.locator('[aria-label="Anúncio simulado"]').count()) === 0 && (await p.textContent('#levelValue')) === '3', 'fase 2 concluída: sem anúncio (começa na fase 3)');
+  await winCurrent();                                                                       // fase 3: com anúncio
+  await p.click('#winMainBtn'); await p.click('#winMainBtn'); await p.waitForTimeout(300);
+  ok((await p.locator('[aria-label="Anúncio simulado"]').count()) === 1, 'fase 3 concluída: anúncio de tela cheia aparece');
+  ok((await p.textContent('#levelValue')) === '3', 'a próxima fase só abre depois do anúncio');
+  await p.waitForTimeout(1900);
+  ok((await p.locator('[aria-label="Anúncio simulado"]').count()) === 0 && (await p.textContent('#levelValue')) === '4', 'anúncio fecha e a fase 4 abre');
+  await winCurrent();                                                                       // fase 4 logo em seguida: intervalo mínimo entre anúncios
+  await p.click('#winMainBtn'); await p.click('#winMainBtn'); await p.waitForTimeout(300);
+  ok((await p.locator('[aria-label="Anúncio simulado"]').count()) === 0, 'intervalo mínimo: sem anúncio em sequência');
+  // controle: recarrega (zera o intervalo mínimo) e confirma que a fase 5 mostra anúncio sem a compra
+  await p.goto(URL + '?teste=1'); await p.waitForTimeout(500); await p.click('#playBtn'); await p.locator('.level-tile:not(.locked)').nth(4).click(); await winCurrent();
+  await p.click('#winMainBtn'); await p.click('#winMainBtn'); await p.waitForTimeout(300);
+  ok((await p.locator('[aria-label="Anúncio simulado"]').count()) === 1, 'controle: sem a compra, a fase 5 mostra anúncio');
+  await p.waitForTimeout(1900);
+  await p.click('#gameBackBtn'); await p.click('#levelsBackBtn'); await p.click('#homeShopBtn');
+  await p.locator('#shopList .pink-row .buy-btn').click(); await p.waitForTimeout(400);
+  ok((await p.textContent('#shopList .pink-row .buy-btn')) === 'COMPRADO', 'compra "Sem anúncios" (modo de teste) marca como comprado');
+  ok(await p.evaluate(() => localStorage.getItem('tubo-certo-noads')) === '1', 'compra "Sem anúncios" fica salva');
+  await p.goto(URL + '?teste=1'); await p.waitForTimeout(500); await p.click('#playBtn'); await p.locator('.level-tile:not(.locked)').nth(4).click(); await winCurrent();
+  await p.click('#winMainBtn'); await p.click('#winMainBtn'); await p.waitForTimeout(300);
+  ok((await p.locator('[aria-label="Anúncio simulado"]').count()) === 0, 'com "Sem anúncios" (e sem intervalo mínimo): nenhum anúncio entre fases');
+  await p.evaluate(() => localStorage.removeItem('tubo-certo-noads'));
+  await p.goto(URL + '?teste=1'); await p.waitForTimeout(500); await p.click('#playBtn');
+
   console.log('# derrota');
   await p.locator('.level-tile:not(.locked)').nth(1).click();
   const lim = await p.evaluate(() => +document.getElementById('progressLabel').textContent.split('LIMITE ')[1]);

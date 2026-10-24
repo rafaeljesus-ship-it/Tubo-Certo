@@ -20,6 +20,8 @@ Siga a ordem abaixo e **teste no aparelho antes de publicar**.
    - `appId`: `br.com.tubocerto.jogo` (o mesmo em `capacitor.config.json`, `android/app/build.gradle` e `strings.xml`). **Não muda depois de publicar.**
    - `privacyUrl`: endereço público da política (ver passo 2).
    - `admob.real.rewarded`: ID do bloco de anúncio **Premiado** criado no AdMob.
+   - `admob.real.interstitial`: ID do bloco **Intersticial** (o anúncio de tela cheia entre as fases).
+   - `ads.interstitial`: quando aparece o anúncio entre fases (hoje: ao concluir cada fase a partir da 3ª, com intervalo mínimo de 45 s; `everyLevels: 2` mostra a cada 2 fases; `enabled: false` desliga).
    - `USE_TEST_ADS`: mude para `false` **só depois** de preencher o ID real. Com `true` aparecem anúncios de teste do Google (não pague nem clique em anúncios reais da própria conta: o AdMob suspende a conta por isso).
 2. `android/app/src/main/res/values/strings.xml`: `admob_app_id` = ID do **aplicativo** no AdMob (`ca-app-pub-…~…`). Hoje está o ID de teste do Google.
 3. `privacidade.html`: preencha seu nome/empresa, e-mail e data (os trechos amarelos tracejados).
@@ -32,9 +34,9 @@ Publique `privacidade.html` num endereço público. Se você usa o GitHub Pages 
 ## 3. AdMob
 
 1. Crie o app no AdMob (Android) → copie o **ID do app**.
-2. Crie um bloco de anúncios do tipo **Premiado (rewarded)** → copie o **ID do bloco**.
+2. Crie dois blocos de anúncios: **Premiado (rewarded)** e **Intersticial** → copie o **ID de cada bloco**.
 3. Em *Privacidade e mensagens*, crie e publique a mensagem de consentimento (GDPR/UMP). O jogo já chama o formulário quando a lei exige.
-4. Anúncios só aparecem quando o jogador escolhe assistir (vidas, moedas, dobrar prêmio). Não há anúncio forçado.
+4. Há dois tipos: os **premiados** (o jogador escolhe assistir: vidas, moedas, dobrar prêmio) e o **intersticial** que aparece ao sair da tela de "Nível concluído" (nunca no meio da partida nem ao abrir/fechar o app). A compra "Sem anúncios" remove só o intersticial; os premiados continuam.
 
 ## 4. Produtos de compra no Play Console
 
@@ -48,8 +50,10 @@ Publique `privacidade.html` num endereço público. Se você usa o GitHub Pages 
 | `moedas_2500` | 2.500 moedas | 84,90 |
 | `vida_1` | +1 vida | 2,90 |
 | `vidas_5` | +5 vidas | 9,90 |
+| `sem_anuncios` | tira os anúncios entre fases (**não consumível**: tipo "produto gerenciado" de compra única) | 14,90 |
 
 O preço mostrado no jogo vem da loja (já em R$ e com impostos). Se mudar IDs, mude também `js/config.js`.
+O `sem_anuncios` é **compra única**: o jogo a restaura sozinho ao abrir (mesma conta Google) e há o botão *Configurações → Restaurar compras* (a Google Play exige esse caminho de restauração).
 Conta de **testador de licença** (Play Console → Configurações → Teste de licença) deixa você comprar sem ser cobrado.
 
 ## 5. Gerar o app
@@ -87,9 +91,9 @@ Sugestão: ative o *Play App Signing* (a Google guarda a chave final).
 ## 8. Teste antes de publicar (no celular)
 
 1. Instale o `.aab` por *Teste interno* (Play Console → Testes → Teste interno).
-2. Com conta de testador de licença: compre cada um dos 6 itens; confira que o item chega **uma vez** e que o preço aparece em R$.
+2. Com conta de testador de licença: compre cada um dos 7 itens; confira que o item chega **uma vez** e que o preço aparece em R$.
 3. Cancele uma compra no meio: nada deve ser creditado.
-4. Assista a um anúncio de teste até o fim (ganha) e feche antes (não ganha).
+4. Assista a um anúncio premiado de teste até o fim (ganha) e feche antes (não ganha). Conclua a fase 3 e confira o intersticial de teste antes da fase 4; compre "Sem anúncios" e confira que ele some. Desinstale, reinstale e confira que "Sem anúncios" volta sozinho.
 5. Desligue a internet e abra o jogo: deve funcionar; as compras avisam que a loja não respondeu.
 6. Em outro idioma/região (VPN) confirme o formulário de consentimento e o botão *Configurações → Privacidade dos anúncios*.
 

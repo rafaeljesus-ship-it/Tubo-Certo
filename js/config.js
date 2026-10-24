@@ -9,8 +9,9 @@ window.TUBO_CONFIG = {
   USE_TEST_ADS: true,                              // TROCAR para false só quando os IDs reais abaixo estiverem preenchidos
   admob: {
     // IDs de teste oficiais do Google (Android). Os reais ficam em "real".
-    test: { rewarded: 'ca-app-pub-3940256099942544/5224354917' },
-    real: { rewarded: 'ca-app-pub-0000000000000000/0000000000' }   // TROCAR pelo ID do bloco "Premiado" do AdMob
+    test: { rewarded: 'ca-app-pub-3940256099942544/5224354917', interstitial: 'ca-app-pub-3940256099942544/1033173712' },
+    real: { rewarded: 'ca-app-pub-0000000000000000/0000000000',      // TROCAR pelo ID do bloco "Premiado" do AdMob
+            interstitial: 'ca-app-pub-0000000000000000/0000000000' } // TROCAR pelo ID do bloco "Intersticial" do AdMob
   },
   // Itens vendidos (produtos "consumíveis" no Google Play Console: mesmo ID, tipo "Produto gerenciado").
   // O preço mostrado no jogo vem da loja (em R$ para o Brasil); "fallback" só aparece se a loja ainda não respondeu.
@@ -20,13 +21,17 @@ window.TUBO_CONFIG = {
     { id: 'moedas_1200', kind: 'coins', amount: 1200, fallback: 'R$ 42,90', bonus: '+20%' },
     { id: 'moedas_2500', kind: 'coins', amount: 2500, fallback: 'R$ 84,90', bonus: '+35%' },
     { id: 'vida_1',      kind: 'lives', amount: 1,    fallback: 'R$ 2,90' },
-    { id: 'vidas_5',     kind: 'lives', amount: 5,    fallback: 'R$ 9,90' }
+    { id: 'vidas_5',     kind: 'lives', amount: 5,    fallback: 'R$ 9,90' },
+    // Compra única (não consumível): tira os anúncios entre fases; os anúncios opcionais de recompensa continuam.
+    { id: 'sem_anuncios', kind: 'noads', nonConsumable: true, fallback: 'R$ 14,90' }
   ],
   // Recompensas por anúncio
   ads: {
     lifeReward: 1,            // vidas por anúncio na tela de vidas
     coinReward: 25,           // moedas por anúncio na loja
     coinAdsPerDay: 5,         // limite diário de anúncios por moedas
-    doubleChest: true         // botão "dobrar prêmio" depois de abrir o baú
+    doubleChest: true,        // botão "dobrar prêmio" depois de abrir o baú
+    // Anúncio de tela cheia ao concluir uma fase (some com a compra "Sem anúncios")
+    interstitial: { enabled: true, fromLevel: 3, everyLevels: 1, minGapMs: 45000 }
   }
 };

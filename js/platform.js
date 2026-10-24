@@ -19,11 +19,15 @@
   var N = null;                       // window.TuboNative, carregado só no app
   var prices = {};                    // id -> preço formatado pela loja
   var pending = {};                   // id -> função que resolve a promessa de purchase()
-  var consentOk = false, adsReady = false, billingReady = false;
+  var consentOk = false, adsReady = false, interReady = false, billingReady = false;
+  var NOADS_KEY = 'tubo-certo-noads';
   var DONE_KEY = 'tubo-certo-tx';
 
   function doneList() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || '[]'); } catch (e) { return []; } }
   function markDone(id) { var l = doneList(); l.push(id); try { localStorage.setItem(DONE_KEY, JSON.stringify(l.slice(-300))); } catch (e) { /* sem storage */ } }
+
+  function readNoAds() { try { return localStorage.getItem(NOADS_KEY) === '1'; } catch (e) { return false; } }
+  var noAds = readNoAds();
 
   var Platform = {
     mode: mode,
@@ -31,6 +35,9 @@
     onPrices: function () {},         // chamado quando a loja devolve os preços
     product: function (id) { return C.products.filter(function (p) { return p.id === id; })[0]; },
     canBuy: function () { return mode === 'native' ? billingReady : mode === 'test'; },
+    hasNoAds: function () { return noAds; },
+    setNoAds: function () { noAds = true; try { localStorage.setItem(NOADS_KEY, '1'); } catch (e) { /* sem storage */ } },
+    canShowInterstitial: function () { return !noAds && (mode === 'test' || (mode === 'native' && interReady)); },
     canShowAds: function () { return mode === 'test' || (mode === 'native' && adsReady); },
     priceOf: function (id) { return prices[id] || (Platform.product(id) || {}).fallback || ''; }
   };
@@ -59,10 +66,22 @@
     });
   }
 
+  // compras únicas (ex.: sem anúncios) já feitas, inclusive em outro aparelho com a mesma conta Google
+  function checkOwned() {
+    C.products.forEach(function (p) {
+      if (p.nonConsumable && N.store.owned(p.id) && !(p.kind === 'noads' && noAds)) { try { Platform.onGrant(p.id); } catch (e) { /* o jogo trata */ } }
+    });
+  }
+  Platform.restore = function () {
+    if (mode === 'test') return Promise.resolve({ ok: true });
+    if (mode !== 'native' || !billingReady) return Promise.resolve({ ok: false, unavailable: true });
+    return N.store.restorePurchases().then(function (err) { checkOwned(); return err ? { ok: false, error: err.message } : { ok: true }; });
+  };
+
   function initBilling() {
     var store = N.store;
     store.register(C.products.map(function (p) {
-      return { id: p.id, type: N.ProductType.CONSUMABLE, platform: N.Platform.GOOGLE_PLAY };
+      return { id: p.id, type: p.nonConsumable ? N.ProductType.NON_CONSUMABLE : N.ProductType.CONSUMABLE, platform: N.Platform.GOOGLE_PLAY };
     }));
     store.when()
       .productUpdated(function () {
@@ -73,7 +92,8 @@
         });
         Platform.onPrices();
       })
-      .approved(function (t) { deliver(t); });
+      .approved(function (t) { deliver(t); })
+      .receiptsReady(function () { checkOwned(); });
     store.error(function (e) { console.warn('Billing:', e && e.code, e && e.message); });
     return store.initialize([N.Platform.GOOGLE_PLAY]).then(function () { billingReady = true; });
   }
@@ -108,7 +128,7 @@
       .then(function (info) {
         consentOk = !!info.canRequestAds;
         if (!consentOk) return;
-        return A.initialize().then(function () { return preloadAd(); });
+        return A.initialize().then(function () { return Promise.all([preloadAd(), initInterstitial()]); });
       });
   }
 
@@ -116,6 +136,40 @@
     adsReady = false;
     return N.AdMob.prepareRewardVideoAd({ adId: rewardedId() }).then(function () { adsReady = true; }, function (e) { console.warn('Anúncio não carregou:', e && e.message); });
   }
+
+  // ---------- anúncio de tela cheia (entre fases) ----------
+  function interstitialId() { return C.USE_TEST_ADS ? C.admob.test.interstitial : C.admob.real.interstitial; }
+  var interDone = null;
+  function preloadInter() {
+    interReady = false;
+    return N.AdMob.prepareInterstitial({ adId: interstitialId() }).then(function () { interReady = true; }, function (e) { console.warn('Intersticial não carregou:', e && e.message); });
+  }
+  function initInterstitial() {
+    var A = N.AdMob, ev = N.InterstitialAdPluginEvents;
+    function finish() { if (interDone) { var f = interDone; interDone = null; f(); } preloadInter(); }
+    A.addListener(ev.Dismissed, finish);
+    A.addListener(ev.FailedToShow, finish);
+    return preloadInter();
+  }
+  // Resolve quando o anúncio fecha (ou falha, ou passa de 15 s): o jogo nunca fica preso.
+  Platform.showInterstitial = function () {
+    if (!Platform.canShowInterstitial()) return Promise.resolve(false);
+    if (mode === 'test') {
+      return new Promise(function (resolve) {
+        var d = document.createElement('div');
+        d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', 'Anúncio simulado');
+        d.style.cssText = 'position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:#111;color:#fff;font:700 20px system-ui;text-align:center';
+        d.textContent = 'ANÚNCIO (simulado)';
+        document.body.appendChild(d);
+        setTimeout(function () { d.remove(); resolve(true); }, 1500);
+      });
+    }
+    return new Promise(function (resolve) {
+      var timer = setTimeout(function () { interDone = null; resolve(false); }, 15000);
+      interDone = function () { clearTimeout(timer); resolve(true); };
+      N.AdMob.showInterstitial().catch(function () { if (interDone) { var f = interDone; interDone = null; f(); } });
+    });
+  };
 
   // Resolve true só se o jogador assistiu até ganhar a recompensa.
   Platform.showRewarded = function () {

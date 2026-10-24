@@ -158,6 +158,7 @@
       ? 'Modo de teste ativo (?teste=1): compras e anúncios são simulados.'
       : 'Suas preferências ficam salvas neste aparelho.';
     $('settingAdsRow').hidden = Platform.mode !== 'native';
+    $('settingRestoreRow').hidden = Platform.mode !== 'native';
   }
 
   // ===================== Moedas =====================
@@ -368,6 +369,17 @@
       row.querySelector('button').addEventListener('click', function () { sfxClick(); buyProduct(pkg.id); });
       list.appendChild(row);
     });
+    // compra única: tira os anúncios entre fases (os opcionais de recompensa continuam)
+    var np = Platform.product('sem_anuncios');
+    if (np && CFG.ads.interstitial.enabled) {
+      var nr = document.createElement('div');
+      nr.className = 'pink-row';
+      var owned = Platform.hasNoAds();
+      nr.innerHTML = '<span class="pr-title"><svg class="ico heart"><use href="#i-shield"/></svg><span class="pr-stack"><span>SEM ANÚNCIOS</span><small>sem anúncios entre as fases</small></span></span>' +
+        '<button class="buy-btn" type="button"' + (owned ? ' disabled' : '') + '>' + (owned ? 'COMPRADO' : Platform.priceOf('sem_anuncios')) + '</button>';
+      nr.querySelector('button').addEventListener('click', function () { sfxClick(); buyProduct('sem_anuncios'); });
+      list.appendChild(nr);
+    }
     // linha de anúncio: moedas grátis (limite diário)
     var left = coinAdsLeft();
     var ad = document.createElement('div');
@@ -387,6 +399,7 @@
     if (!p) return;
     if (p.kind === 'coins') addCoins(p.amount);
     else if (p.kind === 'lives') { gainLife(p.amount); renderLives(); }
+    else if (p.kind === 'noads') { Platform.setNoAds(); }
     if (currentView === 'lives') renderLivesScreen();
     if (currentView === 'shop') renderShop();
   };
@@ -407,7 +420,7 @@
     purchasing = true;
     Platform.purchase(id).then(function (res) {
       purchasing = false;
-      if (res.ok) { sfxWin(); showToast(p.kind === 'coins' ? '+' + p.amount.toLocaleString('pt-BR') + ' moedas! Obrigado!' : '+' + p.amount + (p.amount === 1 ? ' vida!' : ' vidas!')); }
+      if (res.ok) { sfxWin(); showToast(p.kind === 'coins' ? '+' + p.amount.toLocaleString('pt-BR') + ' moedas! Obrigado!' : (p.kind === 'noads' ? 'Anúncios removidos! Obrigado!' : '+' + p.amount + (p.amount === 1 ? ' vida!' : ' vidas!'))); }
       else if (res.unavailable) purchaseUnavailable();
       else if (!res.cancelled) openModal('Não foi possível comprar', '<p>' + (res.error || 'Tente novamente.') + '</p><p><b>Se algo foi cobrado e o item não chegou, ele será entregue automaticamente ao reabrir o jogo.</b></p>');
     });
@@ -805,6 +818,7 @@
     $('rewardTag').className = 'reward-tag';
     $('rewardLine').innerHTML = '<img class="chest" src="' + charUrl('bau') + '" alt=""><span class="reward-hint">Abra o baú</span>';
     $('winMainLabel').textContent = 'ABRIR BAÚ';
+    state.winSeq = (state.winSeq || 0) + 1;
     $('winMainBtn').dataset.step = 'chest';
     $('doubleBtn').hidden = true; state.lastReward = 0;
     $('view-win').classList.remove('shake');
@@ -839,6 +853,24 @@
       addCoins(r.amount);
       showToast('Baú aberto: +' + r.amount + ' moedas');
     }
+  }
+
+  // ---- anúncio de tela cheia ao concluir a fase ----
+  var lastInterAt = 0, interBusy = false;
+  function shouldShowInterstitial() {
+    var I = CFG.ads.interstitial;
+    if (!I || !I.enabled || state.adSeq === state.winSeq) return false;           // um por conclusão
+    if (state.level < I.fromLevel || (state.level - I.fromLevel) % Math.max(1, I.everyLevels) !== 0) return false;
+    if (Date.now() - lastInterAt < I.minGapMs) return false;                        // nunca em sequência
+    return Platform.canShowInterstitial();
+  }
+  // sai da tela de vitória (próxima fase, início ou jogar de novo); mostra o anúncio antes, se for a vez
+  function leaveWin(next) {
+    if (interBusy) return;
+    claimChest();
+    if (!shouldShowInterstitial()) { next(); return; }
+    interBusy = true; state.adSeq = state.winSeq; stopMusic();
+    Platform.showInterstitial().then(function () { lastInterAt = Date.now(); interBusy = false; startMusic(); next(); });
   }
 
   function nextLevel() {
@@ -937,6 +969,12 @@
         { label: 'FECHAR', cls: 'alt' }
       ]);
   });
+  on('settingRestoreRow', function () {
+    Platform.restore().then(function (res) {
+      if (res.ok) showToast(Platform.hasNoAds() ? 'Compras restauradas: anúncios removidos.' : 'Nenhuma compra única para restaurar. (Moedas e vidas não são restauradas.)');
+      else showToast(res.unavailable ? 'A loja ainda não respondeu.' : 'Não foi possível restaurar.');
+    });
+  });
   on('settingAdsRow', function () {
     Platform.privacyOptions().then(function (ok) { if (!ok) showToast('Nenhuma opção de privacidade disponível para a sua região.'); });
   });
@@ -957,11 +995,11 @@
 
   $('winMainBtn').addEventListener('click', function () {
     sfxClick();
-    if ($('winMainBtn').dataset.step === 'chest') openChest(); else nextLevel();
+    if ($('winMainBtn').dataset.step === 'chest') openChest(); else leaveWin(nextLevel);
   });
   on('doubleBtn', function () { watchAd('double'); });
-  on('winHomeBtn', function () { showView('home'); });
-  on('winRetryBtn', function () { claimChest(); restart(); });
+  on('winHomeBtn', function () { leaveWin(function () { showView('home'); }); });
+  on('winRetryBtn', function () { leaveWin(restart); });
   on('winShareBtn', function () {
     var text = 'Terminei o nível ' + state.level + ' de Tubo Certo em ' + state.moves + ' movimentos!';
     if (navigator.share) navigator.share({ title: 'Tubo Certo', text: text }).catch(function () { /* cancelado */ });

@@ -65,7 +65,7 @@ NODE_PATH=$(npm root -g) node tests/e2e.js /pasta/das/capturas
 
 ## Limitações conhecidas
 
-- **Compras e anúncios**: implementados para o app Android (Google Play Billing + AdMob premiado) em `js/platform.js`, mas **ainda não testados em aparelho real nem contra a Play/AdMob**. No navegador ficam indisponíveis (nada é cobrado).
+- **Compras e anúncios**: implementados para o app Android (Google Play Billing + AdMob premiado e intersticial entre fases; compra única "Sem anúncios") em `js/platform.js`, mas **ainda não testados em aparelho real nem contra a Play/AdMob**. No navegador ficam indisponíveis (nada é cobrado).
 - **Sem validação de recibo em servidor**: a entrega é feita no aparelho.
 - **Ranking removido do menu** (precisa de servidor); o código da tela continua no projeto.
 - Guia completo para publicar: `loja/GUIA_PUBLICACAO.md`.

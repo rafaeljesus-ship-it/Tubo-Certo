@@ -1010,6 +1010,7 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
         <button class="set-row" id="settingHelpRow" type="button"><svg class="ico"><use href="#i-help"/></svg><span>Ajuda</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
         <button class="set-row" id="settingPrivacyRow" type="button"><svg class="ico"><use href="#i-shield"/></svg><span>Política de Privacidade</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
         <button class="set-row" id="settingAdsRow" type="button" hidden><svg class="ico"><use href="#i-shield"/></svg><span>Privacidade dos anúncios</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
+        <button class="set-row" id="settingRestoreRow" type="button" hidden><svg class="ico"><use href="#i-restart"/></svg><span>Restaurar compras</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
         <button class="set-row danger" id="settingResetRow" type="button"><svg class="ico"><use href="#i-trash"/></svg><span>Apagar progresso</span><svg class="ico chev"><use href="#i-chev"/></svg></button>
       </div>
       <p class="fine" id="settingsNote"></p>
@@ -1115,8 +1116,9 @@ window.TUBO_CONFIG = {
   USE_TEST_ADS: true,                              // TROCAR para false só quando os IDs reais abaixo estiverem preenchidos
   admob: {
     // IDs de teste oficiais do Google (Android). Os reais ficam em "real".
-    test: { rewarded: 'ca-app-pub-3940256099942544/5224354917' },
-    real: { rewarded: 'ca-app-pub-0000000000000000/0000000000' }   // TROCAR pelo ID do bloco "Premiado" do AdMob
+    test: { rewarded: 'ca-app-pub-3940256099942544/5224354917', interstitial: 'ca-app-pub-3940256099942544/1033173712' },
+    real: { rewarded: 'ca-app-pub-0000000000000000/0000000000',      // TROCAR pelo ID do bloco "Premiado" do AdMob
+            interstitial: 'ca-app-pub-0000000000000000/0000000000' } // TROCAR pelo ID do bloco "Intersticial" do AdMob
   },
   // Itens vendidos (produtos "consumíveis" no Google Play Console: mesmo ID, tipo "Produto gerenciado").
   // O preço mostrado no jogo vem da loja (em R$ para o Brasil); "fallback" só aparece se a loja ainda não respondeu.
@@ -1126,14 +1128,18 @@ window.TUBO_CONFIG = {
     { id: 'moedas_1200', kind: 'coins', amount: 1200, fallback: 'R$ 42,90', bonus: '+20%' },
     { id: 'moedas_2500', kind: 'coins', amount: 2500, fallback: 'R$ 84,90', bonus: '+35%' },
     { id: 'vida_1',      kind: 'lives', amount: 1,    fallback: 'R$ 2,90' },
-    { id: 'vidas_5',     kind: 'lives', amount: 5,    fallback: 'R$ 9,90' }
+    { id: 'vidas_5',     kind: 'lives', amount: 5,    fallback: 'R$ 9,90' },
+    // Compra única (não consumível): tira os anúncios entre fases; os anúncios opcionais de recompensa continuam.
+    { id: 'sem_anuncios', kind: 'noads', nonConsumable: true, fallback: 'R$ 14,90' }
   ],
   // Recompensas por anúncio
   ads: {
     lifeReward: 1,            // vidas por anúncio na tela de vidas
     coinReward: 25,           // moedas por anúncio na loja
     coinAdsPerDay: 5,         // limite diário de anúncios por moedas
-    doubleChest: true         // botão "dobrar prêmio" depois de abrir o baú
+    doubleChest: true,        // botão "dobrar prêmio" depois de abrir o baú
+    // Anúncio de tela cheia ao concluir uma fase (some com a compra "Sem anúncios")
+    interstitial: { enabled: true, fromLevel: 3, everyLevels: 1, minGapMs: 45000 }
   }
 };
 
@@ -1158,11 +1164,15 @@ window.TUBO_CONFIG = {
   var N = null;                       // window.TuboNative, carregado só no app
   var prices = {};                    // id -> preço formatado pela loja
   var pending = {};                   // id -> função que resolve a promessa de purchase()
-  var consentOk = false, adsReady = false, billingReady = false;
+  var consentOk = false, adsReady = false, interReady = false, billingReady = false;
+  var NOADS_KEY = 'tubo-certo-noads';
   var DONE_KEY = 'tubo-certo-tx';
 
   function doneList() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || '[]'); } catch (e) { return []; } }
   function markDone(id) { var l = doneList(); l.push(id); try { localStorage.setItem(DONE_KEY, JSON.stringify(l.slice(-300))); } catch (e) { /* sem storage */ } }
+
+  function readNoAds() { try { return localStorage.getItem(NOADS_KEY) === '1'; } catch (e) { return false; } }
+  var noAds = readNoAds();
 
   var Platform = {
     mode: mode,
@@ -1170,6 +1180,9 @@ window.TUBO_CONFIG = {
     onPrices: function () {},         // chamado quando a loja devolve os preços
     product: function (id) { return C.products.filter(function (p) { return p.id === id; })[0]; },
     canBuy: function () { return mode === 'native' ? billingReady : mode === 'test'; },
+    hasNoAds: function () { return noAds; },
+    setNoAds: function () { noAds = true; try { localStorage.setItem(NOADS_KEY, '1'); } catch (e) { /* sem storage */ } },
+    canShowInterstitial: function () { return !noAds && (mode === 'test' || (mode === 'native' && interReady)); },
     canShowAds: function () { return mode === 'test' || (mode === 'native' && adsReady); },
     priceOf: function (id) { return prices[id] || (Platform.product(id) || {}).fallback || ''; }
   };
@@ -1198,10 +1211,22 @@ window.TUBO_CONFIG = {
     });
   }
 
+  // compras únicas (ex.: sem anúncios) já feitas, inclusive em outro aparelho com a mesma conta Google
+  function checkOwned() {
+    C.products.forEach(function (p) {
+      if (p.nonConsumable && N.store.owned(p.id) && !(p.kind === 'noads' && noAds)) { try { Platform.onGrant(p.id); } catch (e) { /* o jogo trata */ } }
+    });
+  }
+  Platform.restore = function () {
+    if (mode === 'test') return Promise.resolve({ ok: true });
+    if (mode !== 'native' || !billingReady) return Promise.resolve({ ok: false, unavailable: true });
+    return N.store.restorePurchases().then(function (err) { checkOwned(); return err ? { ok: false, error: err.message } : { ok: true }; });
+  };
+
   function initBilling() {
     var store = N.store;
     store.register(C.products.map(function (p) {
-      return { id: p.id, type: N.ProductType.CONSUMABLE, platform: N.Platform.GOOGLE_PLAY };
+      return { id: p.id, type: p.nonConsumable ? N.ProductType.NON_CONSUMABLE : N.ProductType.CONSUMABLE, platform: N.Platform.GOOGLE_PLAY };
     }));
     store.when()
       .productUpdated(function () {
@@ -1212,7 +1237,8 @@ window.TUBO_CONFIG = {
         });
         Platform.onPrices();
       })
-      .approved(function (t) { deliver(t); });
+      .approved(function (t) { deliver(t); })
+      .receiptsReady(function () { checkOwned(); });
     store.error(function (e) { console.warn('Billing:', e && e.code, e && e.message); });
     return store.initialize([N.Platform.GOOGLE_PLAY]).then(function () { billingReady = true; });
   }
@@ -1247,7 +1273,7 @@ window.TUBO_CONFIG = {
       .then(function (info) {
         consentOk = !!info.canRequestAds;
         if (!consentOk) return;
-        return A.initialize().then(function () { return preloadAd(); });
+        return A.initialize().then(function () { return Promise.all([preloadAd(), initInterstitial()]); });
       });
   }
 
@@ -1255,6 +1281,40 @@ window.TUBO_CONFIG = {
     adsReady = false;
     return N.AdMob.prepareRewardVideoAd({ adId: rewardedId() }).then(function () { adsReady = true; }, function (e) { console.warn('Anúncio não carregou:', e && e.message); });
   }
+
+  // ---------- anúncio de tela cheia (entre fases) ----------
+  function interstitialId() { return C.USE_TEST_ADS ? C.admob.test.interstitial : C.admob.real.interstitial; }
+  var interDone = null;
+  function preloadInter() {
+    interReady = false;
+    return N.AdMob.prepareInterstitial({ adId: interstitialId() }).then(function () { interReady = true; }, function (e) { console.warn('Intersticial não carregou:', e && e.message); });
+  }
+  function initInterstitial() {
+    var A = N.AdMob, ev = N.InterstitialAdPluginEvents;
+    function finish() { if (interDone) { var f = interDone; interDone = null; f(); } preloadInter(); }
+    A.addListener(ev.Dismissed, finish);
+    A.addListener(ev.FailedToShow, finish);
+    return preloadInter();
+  }
+  // Resolve quando o anúncio fecha (ou falha, ou passa de 15 s): o jogo nunca fica preso.
+  Platform.showInterstitial = function () {
+    if (!Platform.canShowInterstitial()) return Promise.resolve(false);
+    if (mode === 'test') {
+      return new Promise(function (resolve) {
+        var d = document.createElement('div');
+        d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', 'Anúncio simulado');
+        d.style.cssText = 'position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:#111;color:#fff;font:700 20px system-ui;text-align:center';
+        d.textContent = 'ANÚNCIO (simulado)';
+        document.body.appendChild(d);
+        setTimeout(function () { d.remove(); resolve(true); }, 1500);
+      });
+    }
+    return new Promise(function (resolve) {
+      var timer = setTimeout(function () { interDone = null; resolve(false); }, 15000);
+      interDone = function () { clearTimeout(timer); resolve(true); };
+      N.AdMob.showInterstitial().catch(function () { if (interDone) { var f = interDone; interDone = null; f(); } });
+    });
+  };
 
   // Resolve true só se o jogador assistiu até ganhar a recompensa.
   Platform.showRewarded = function () {
@@ -1691,6 +1751,7 @@ window.TUBO_CONFIG = {
       ? 'Modo de teste ativo (?teste=1): compras e anúncios são simulados.'
       : 'Suas preferências ficam salvas neste aparelho.';
     $('settingAdsRow').hidden = Platform.mode !== 'native';
+    $('settingRestoreRow').hidden = Platform.mode !== 'native';
   }
 
   // ===================== Moedas =====================
@@ -1901,6 +1962,17 @@ window.TUBO_CONFIG = {
       row.querySelector('button').addEventListener('click', function () { sfxClick(); buyProduct(pkg.id); });
       list.appendChild(row);
     });
+    // compra única: tira os anúncios entre fases (os opcionais de recompensa continuam)
+    var np = Platform.product('sem_anuncios');
+    if (np && CFG.ads.interstitial.enabled) {
+      var nr = document.createElement('div');
+      nr.className = 'pink-row';
+      var owned = Platform.hasNoAds();
+      nr.innerHTML = '<span class="pr-title"><svg class="ico heart"><use href="#i-shield"/></svg><span class="pr-stack"><span>SEM ANÚNCIOS</span><small>sem anúncios entre as fases</small></span></span>' +
+        '<button class="buy-btn" type="button"' + (owned ? ' disabled' : '') + '>' + (owned ? 'COMPRADO' : Platform.priceOf('sem_anuncios')) + '</button>';
+      nr.querySelector('button').addEventListener('click', function () { sfxClick(); buyProduct('sem_anuncios'); });
+      list.appendChild(nr);
+    }
     // linha de anúncio: moedas grátis (limite diário)
     var left = coinAdsLeft();
     var ad = document.createElement('div');
@@ -1920,6 +1992,7 @@ window.TUBO_CONFIG = {
     if (!p) return;
     if (p.kind === 'coins') addCoins(p.amount);
     else if (p.kind === 'lives') { gainLife(p.amount); renderLives(); }
+    else if (p.kind === 'noads') { Platform.setNoAds(); }
     if (currentView === 'lives') renderLivesScreen();
     if (currentView === 'shop') renderShop();
   };
@@ -1940,7 +2013,7 @@ window.TUBO_CONFIG = {
     purchasing = true;
     Platform.purchase(id).then(function (res) {
       purchasing = false;
-      if (res.ok) { sfxWin(); showToast(p.kind === 'coins' ? '+' + p.amount.toLocaleString('pt-BR') + ' moedas! Obrigado!' : '+' + p.amount + (p.amount === 1 ? ' vida!' : ' vidas!')); }
+      if (res.ok) { sfxWin(); showToast(p.kind === 'coins' ? '+' + p.amount.toLocaleString('pt-BR') + ' moedas! Obrigado!' : (p.kind === 'noads' ? 'Anúncios removidos! Obrigado!' : '+' + p.amount + (p.amount === 1 ? ' vida!' : ' vidas!'))); }
       else if (res.unavailable) purchaseUnavailable();
       else if (!res.cancelled) openModal('Não foi possível comprar', '<p>' + (res.error || 'Tente novamente.') + '</p><p><b>Se algo foi cobrado e o item não chegou, ele será entregue automaticamente ao reabrir o jogo.</b></p>');
     });
@@ -2338,6 +2411,7 @@ window.TUBO_CONFIG = {
     $('rewardTag').className = 'reward-tag';
     $('rewardLine').innerHTML = '<img class="chest" src="' + charUrl('bau') + '" alt=""><span class="reward-hint">Abra o baú</span>';
     $('winMainLabel').textContent = 'ABRIR BAÚ';
+    state.winSeq = (state.winSeq || 0) + 1;
     $('winMainBtn').dataset.step = 'chest';
     $('doubleBtn').hidden = true; state.lastReward = 0;
     $('view-win').classList.remove('shake');
@@ -2372,6 +2446,24 @@ window.TUBO_CONFIG = {
       addCoins(r.amount);
       showToast('Baú aberto: +' + r.amount + ' moedas');
     }
+  }
+
+  // ---- anúncio de tela cheia ao concluir a fase ----
+  var lastInterAt = 0, interBusy = false;
+  function shouldShowInterstitial() {
+    var I = CFG.ads.interstitial;
+    if (!I || !I.enabled || state.adSeq === state.winSeq) return false;           // um por conclusão
+    if (state.level < I.fromLevel || (state.level - I.fromLevel) % Math.max(1, I.everyLevels) !== 0) return false;
+    if (Date.now() - lastInterAt < I.minGapMs) return false;                        // nunca em sequência
+    return Platform.canShowInterstitial();
+  }
+  // sai da tela de vitória (próxima fase, início ou jogar de novo); mostra o anúncio antes, se for a vez
+  function leaveWin(next) {
+    if (interBusy) return;
+    claimChest();
+    if (!shouldShowInterstitial()) { next(); return; }
+    interBusy = true; state.adSeq = state.winSeq; stopMusic();
+    Platform.showInterstitial().then(function () { lastInterAt = Date.now(); interBusy = false; startMusic(); next(); });
   }
 
   function nextLevel() {
@@ -2470,6 +2562,12 @@ window.TUBO_CONFIG = {
         { label: 'FECHAR', cls: 'alt' }
       ]);
   });
+  on('settingRestoreRow', function () {
+    Platform.restore().then(function (res) {
+      if (res.ok) showToast(Platform.hasNoAds() ? 'Compras restauradas: anúncios removidos.' : 'Nenhuma compra única para restaurar. (Moedas e vidas não são restauradas.)');
+      else showToast(res.unavailable ? 'A loja ainda não respondeu.' : 'Não foi possível restaurar.');
+    });
+  });
   on('settingAdsRow', function () {
     Platform.privacyOptions().then(function (ok) { if (!ok) showToast('Nenhuma opção de privacidade disponível para a sua região.'); });
   });
@@ -2490,11 +2588,11 @@ window.TUBO_CONFIG = {
 
   $('winMainBtn').addEventListener('click', function () {
     sfxClick();
-    if ($('winMainBtn').dataset.step === 'chest') openChest(); else nextLevel();
+    if ($('winMainBtn').dataset.step === 'chest') openChest(); else leaveWin(nextLevel);
   });
   on('doubleBtn', function () { watchAd('double'); });
-  on('winHomeBtn', function () { showView('home'); });
-  on('winRetryBtn', function () { claimChest(); restart(); });
+  on('winHomeBtn', function () { leaveWin(function () { showView('home'); }); });
+  on('winRetryBtn', function () { leaveWin(restart); });
   on('winShareBtn', function () {
     var text = 'Terminei o nível ' + state.level + ' de Tubo Certo em ' + state.moves + ' movimentos!';
     if (navigator.share) navigator.share({ title: 'Tubo Certo', text: text }).catch(function () { /* cancelado */ });
