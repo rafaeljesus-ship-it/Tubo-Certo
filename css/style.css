@@ -209,7 +209,7 @@ button.coin-pill { cursor: pointer; }
 
 /* ---------- 3. puzzle ---------- */
 #view-game { padding-bottom: max(2.5cqw, env(safe-area-inset-bottom)); }
-.game-top { position: relative; z-index: 2; display: grid; grid-template-columns: auto 1fr 1.35fr 1.5fr; gap: 2cqw; align-items: stretch; padding: 3.5cqw 3cqw 0; }
+.game-top { position: relative; z-index: 2; display: grid; grid-template-columns: auto 1fr 1.3fr 1.6fr; gap: 2cqw; align-items: stretch; padding: 3.5cqw 3cqw 0; }
 .game-nav { display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 1.5cqw; }
 .hud-card, .hud-wallet { border: 3.5px solid var(--ink); border-radius: 3.2cqw; box-shadow: 0 3px 0 var(--ink), inset 0 2px 0 rgba(255,255,255,.28); }
 .hud-card { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.4cqw .8cqw; min-width: 0; background: linear-gradient(180deg, #3a79d8, var(--blue-dark)); color: #fff; }
@@ -218,7 +218,8 @@ button.coin-pill { cursor: pointer; }
 .hud-wallet { display: flex; flex-direction: column; justify-content: center; gap: 1.2cqw; padding: 1.6cqw 1.8cqw; background: linear-gradient(180deg, #3a2412, #1b1109); min-width: 0; }
 .wallet-coins { display: flex; align-items: center; justify-content: space-between; gap: 1cqw; padding: 0; background: none; border: 0; color: #fff; font: 400 5.4cqw/1 var(--display); }
 .wallet-coins b { flex: 1; text-align: left; font-weight: 400; font-variant-numeric: tabular-nums; }
-.wallet-lives { display: flex; justify-content: center; gap: .6cqw; padding: 0; background: none; border: 0; }
+.wallet-lives { display: flex; justify-content: space-between; gap: 2px; width: 100%; padding: 0; background: none; border: 0; }
+.wallet-lives .heart { flex: 1 1 0; min-width: 0; width: auto; height: auto; aspect-ratio: 1; max-width: 5.2cqw; }
 .heart { width: 4.8cqw; height: 4.8cqw; stroke: var(--ink); stroke-width: 2.4px; stroke-linejoin: round; paint-order: stroke; }
 .heart.full { color: #ff3b2a; }
 .heart.empty { color: #5d4d3b; }
@@ -432,4 +433,69 @@ canvas.confetti { position: absolute; inset: 0; width: 100%; height: 100%; z-ind
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
   .pow-burst { opacity: 1; transform: translate(-50%, -50%) rotate(-5deg); animation: none !important; }
+}
+
+/* ==========================================================================
+   BRILHO — reflexos, faíscas e varreduras de luz (desligados com reduce-motion)
+   ========================================================================== */
+@keyframes sheen { 0% { transform: translateX(-130%) skewX(-22deg); } 55%, 100% { transform: translateX(260%) skewX(-22deg); } }
+@keyframes twinkle { 0%, 100% { transform: scale(0) rotate(0); opacity: 0; } 50% { transform: scale(1) rotate(90deg); opacity: 1; } }
+@keyframes glowPulse { 50% { filter: drop-shadow(0 0 14px rgba(255, 214, 64, .95)) drop-shadow(0 .8cqw 0 rgba(27,17,9,.35)); } }
+
+/* varredura de luz nos botões principais e fichas */
+.btn-big, .level-tile:not(.locked), .buy-btn, .hud-card { position: relative; overflow: hidden; }
+.btn-big::before, .buy-btn::before, .level-tile:not(.locked)::before, .hud-card::before {
+  content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 38%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .75), transparent);
+  transform: translateX(-130%) skewX(-22deg); animation: sheen 3.6s ease-in-out infinite;
+}
+.buy-btn::before { animation-duration: 4.4s; animation-delay: 1s; }
+.level-tile:not(.locked)::before { animation-delay: .6s; animation-duration: 5s; }
+.hud-card::before { animation-duration: 6s; animation-delay: 2s; opacity: .6; }
+.btn-big > *, .buy-btn > * { position: relative; }
+
+/* brilho extra nos botões redondos e ícones */
+.round-btn::before { content: ''; position: absolute; top: 7%; left: 14%; width: 48%; height: 26%; border-radius: 50%; background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,0)); pointer-events: none; }
+.round-btn .ico { position: relative; }
+
+/* logotipo e títulos com luz */
+.logo { filter: drop-shadow(0 0 14px rgba(255, 200, 40, .55)); }
+#view-home .logo { animation: glowPulse 3s ease-in-out infinite; }
+.ribbon h2, .ribbon h3 { text-shadow: 0 1px 0 rgba(255, 255, 255, .55); }
+
+/* mascotes mais vivos */
+.home-mascot, .win-mascots img, .fail-mascot img { filter: saturate(1.12) brightness(1.04) drop-shadow(0 .8cqw 0 rgba(27, 17, 9, .35)) drop-shadow(0 0 10px rgba(255, 255, 255, .25)); }
+
+/* tubos: vidro com reflexos e blocos de cor com brilho de verniz */
+.glass { background: linear-gradient(90deg, rgba(255,255,255,.92), rgba(225,242,255,.38) 34%, rgba(255,255,255,.2) 62%, rgba(255,255,255,.7)); }
+.glass::before { content: ''; position: absolute; z-index: 4; right: 12%; top: 26px; bottom: 30%; width: 2px; border-radius: 2px; background: rgba(255, 255, 255, .8); pointer-events: none; }
+.seg { box-shadow: inset 0 3px 0 rgba(255, 255, 255, .55), inset 0 -4px 0 rgba(0, 0, 0, .16); }
+.seg::before { content: ''; position: absolute; left: 12%; top: 10%; width: 46%; height: 26%; border-radius: 40%; background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.05)); }
+.seg::after { content: ''; position: absolute; right: 12%; top: 14%; width: 9%; height: 9%; border-radius: 50%; background: rgba(255, 255, 255, .9); }
+.tube.selected { filter: drop-shadow(0 0 9px #fff2a0) drop-shadow(0 0 3px #ffd84d) drop-shadow(0 3px 0 rgba(27,17,9,.4)); }
+.tube.solved { filter: drop-shadow(0 0 8px rgba(255, 200, 40, .9)); animation: glowPulse 1.8s ease-in-out infinite; }
+.tube.solved::after { content: ''; position: absolute; z-index: 5; left: 50%; top: -14px; width: 18px; height: 18px; margin-left: -9px; background: #fff7b0; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 1.6s ease-in-out infinite; }
+
+/* faíscas decorativas */
+.sparkles { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.sparkles i { position: absolute; width: 5cqw; height: 5cqw; background: #fffbe0; filter: drop-shadow(0 0 6px #ffe27a);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: twinkle 2.4s ease-in-out infinite; }
+.sparkles i:nth-child(odd) { width: 3.4cqw; height: 3.4cqw; }
+.sparkles i:nth-child(1) { left: 12%; top: 46%; animation-delay: 0s; } .sparkles i:nth-child(2) { left: 80%; top: 40%; animation-delay: .5s; }
+.sparkles i:nth-child(3) { left: 46%; top: 52%; animation-delay: 1s; } .sparkles i:nth-child(4) { left: 24%; top: 66%; animation-delay: 1.5s; }
+.sparkles i:nth-child(5) { left: 70%; top: 62%; animation-delay: .8s; } .sparkles i:nth-child(6) { left: 90%; top: 20%; animation-delay: 1.9s; }
+.sparkles i:nth-child(7) { left: 6%; top: 24%; animation-delay: 1.2s; } .sparkles i:nth-child(8) { left: 56%; top: 30%; animation-delay: .3s; }
+#view-home .sparkles, .win .sparkles { z-index: 1; }
+
+/* moedas e estrelas com cintilação */
+svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { filter: drop-shadow(0 0 4px rgba(255, 214, 64, .9)); }
+.stars-row .ico.on { animation: starPop .6s cubic-bezier(.3, 1.6, .5, 1) both, glowPulse 2s 1s ease-in-out infinite; }
+.reward-line .ico.coin { animation: coinSpin 1.6s ease-in-out infinite; }
+@keyframes coinSpin { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.25); } }
+.meta-fill { box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45); }
+.board { box-shadow: 0 4px 0 var(--ink), inset 0 0 0 3px rgba(255, 255, 255, .5), inset 0 14px 28px rgba(255, 255, 255, .45); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sparkles i { animation: none !important; opacity: .9; transform: scale(1); }
+  .btn-big::before, .buy-btn::before, .level-tile::before, .hud-card::before { display: none; }
 }
