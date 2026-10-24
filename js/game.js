@@ -11,7 +11,14 @@
   // Paleta do kit (tubo_certo_assets/blocks): a ordem é a do índice de cor do motor.
   var COLOR_NAMES = ['red', 'yellow', 'blue', 'green', 'purple', 'orange', 'pink', 'cyan', 'lime', 'gray'];
   var BALL_COLORS = ['#e5321f', '#ffcf1f', '#2d68c9', '#1fb98a', '#8e44c2', '#ff8a1c', '#ff6fa6', '#19bfd0', '#8fd02a', '#a9aca9']; // confete
-  var KIT = 'tubo_certo_assets/adaptados/';
+  // Arte do jogo (PNG/SVG separados em assets/jogo). O tools/build-single.py troca estes caminhos por data URIs.
+  var ART = {
+    tubo: 'assets/jogo/tubo.png',
+    selecionado: 'assets/jogo/estado-selecionado.svg',
+    valido: 'assets/jogo/estado-valido.svg',
+    completo: 'assets/jogo/estado-completo.svg'
+  };
+  function pieceUrl(name) { return 'assets/jogo/peca-' + name + '.png'; }
 
   var TEST_MODE = /[?&]teste=1/.test(location.search);
 
@@ -567,7 +574,7 @@
   // --- layout no formato do mockup: tubos de paredes retas sobre prateleiras.
   // Cada fileira fica sobre uma prateleira; a bancada com as ferramentas vem logo abaixo.
   // O tamanho do tubo é o maior que cabe na largura e na altura reais (HUD e bancada descontados).
-  var TUBE_ASPECT = 3;   // tubo do mockup: 100 × 300
+  var TUBE_ASPECT = 3.526;   // tubo 312 × 1100 (arte gerada)
   function layoutFor(n) {
     var area = boardWrap;
     var cs = getComputedStyle(area);
@@ -576,7 +583,7 @@
     if (W <= 0 || H <= 0) return null;
     var padX = Math.max(10, Math.round(W * 0.035));
     var padTop = Math.max(26, Math.round(W * 0.09));
-    var shelf = Math.max(12, Math.round(W * 0.042));
+    var shelf = Math.max(20, Math.round(W * 0.075));
     var rowGap = Math.max(10, Math.round(W * 0.035));
     // tela larga (ou quadrada como no mockup): uma fileira; celular comprido: 2–3 fileiras para os tubos crescerem.
     var best = null;
@@ -595,7 +602,7 @@
   }
 
   function segSvg(c, dropped) {
-    return '<svg class="seg' + (dropped ? ' just-dropped' : '') + '" viewBox="0 0 84 84" preserveAspectRatio="none" data-c="' + c + '" aria-hidden="true"><use href="#seg-' + COLOR_NAMES[c] + '"/></svg>';
+    return '<img class="seg' + (dropped ? ' just-dropped' : '') + '" src="' + pieceUrl(COLOR_NAMES[c]) + '" data-c="' + c + '" alt="" draggable="false">';
   }
 
   function render() {
@@ -629,10 +636,10 @@
         tube.forEach(function (c, bi) { layers += segSvg(c, idx === state.lastPourTo && bi === tube.length - 1); });
         layers += '</div>';
         el.innerHTML = layers +
-          '<img class="glass-layer" src="' + KIT + 'tube-glass.svg" alt="" draggable="false">' +
-          '<img class="st-sel" src="' + KIT + 'tube-selected.svg" alt="" draggable="false">' +
-          '<img class="st-valid" src="' + KIT + 'tube-valid.svg" alt="" draggable="false">' +
-          '<img class="st-done" src="' + KIT + 'tube-complete.svg" alt="" draggable="false">';
+          '<img class="glass-layer" src="' + ART.tubo + '" alt="" draggable="false">' +
+          '<img class="st-sel" src="' + ART.selecionado + '" alt="" draggable="false">' +
+          '<img class="st-valid" src="' + ART.valido + '" alt="" draggable="false">' +
+          '<img class="st-done" src="' + ART.completo + '" alt="" draggable="false">';
         el.addEventListener('click', function () { handleTubeClick(idx); });
         rows[Math.min(L.r - 1, Math.floor(idx / per))].appendChild(el);
       });
@@ -891,7 +898,7 @@
 
   // ===================== Início =====================
   function start() {
-    ['tube-glass', 'tube-selected', 'tube-valid', 'tube-complete'].forEach(function (n) { new Image().src = KIT + n + '.svg'; });
+    [ART.tubo, ART.selecionado, ART.valido, ART.completo].concat(COLOR_NAMES.map(pieceUrl)).forEach(function (u) { new Image().src = u; });
     state.coins = loadCoins();
     syncLives();
     renderLives();

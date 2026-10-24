@@ -687,3 +687,28 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 #gameBench { padding: 4cqw 3cqw 4.4cqw !important; gap: 5cqw !important; }
 #gameBench .round-btn { --sz: clamp(54px, 16.6cqw, 78px) !important; }
 #gameBench .badge { min-width: 24px; height: 24px; font-size: 12px; top: -6px; right: -6px; }
+
+/* ==========================================================================
+   ARTE GERADA POR IA (assets/jogo): tubo de vidro, peças, prateleira e painel de pergaminho.
+   Último bloco do arquivo: substitui o desenho em SVG/CSS anterior.
+   ========================================================================== */
+.tube { width: var(--tw, 60px) !important; height: calc(var(--tw, 60px) * 3.526) !important; filter: drop-shadow(0 3px 2px rgba(27, 17, 9, .22)) !important; }
+.tube .layers { left: 18.4% !important; right: 18.4% !important; top: 10.2% !important; bottom: 8.4% !important; gap: .7% !important; }
+.tube .seg { width: 100%; height: calc((100% - 2.1%) / 4) !important; object-fit: fill; display: block; filter: drop-shadow(0 1px .5px rgba(27, 17, 9, .25)); }
+.tube .glass-layer { z-index: 3; }
+.tube.selected { transform: translateY(-3.5%) !important; }
+.tube.solved::after { display: none !important; }
+
+/* prateleira: faixa de madeira com cantoneiras de latão (3 partes: cantos fixos, meio esticado) */
+.tube-row { padding-bottom: calc(var(--shelf, 24px) * .62) !important; }
+.tube-row::after {
+  content: ''; position: absolute; bottom: 0; height: var(--shelf, 24px); z-index: 0;
+  left: calc(-1 * var(--pad, 14px) - 3cqw); right: calc(-1 * var(--pad, 14px) - 3cqw);
+  background: none !important; box-shadow: none !important; border-radius: 0 !important;
+  border-style: solid; border-color: transparent; border-width: 0 calc(var(--shelf, 24px) * 1.1);
+  border-image: url('../assets/jogo/prateleira.png') 0 170 0 170 fill / 0 calc(var(--shelf, 24px) * 1.1) 0 calc(var(--shelf, 24px) * 1.1) stretch;
+  filter: drop-shadow(0 3px 0 rgba(27, 17, 9, .3));
+}
+.tube-row:not(:last-child)::after { left: calc(-1 * var(--pad, 14px) - 1cqw); right: calc(-1 * var(--pad, 14px) - 1cqw); }
+
+#boardPanel > .board-hint { top: 1.6cqw !important; }

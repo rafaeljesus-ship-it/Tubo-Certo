@@ -25,6 +25,7 @@ Sem esse parâmetro, as compras em dinheiro mostram um aviso de "pagamento indis
 | `tubo_certo_assets/` | Kit visual de gameplay (SVG): vidro, estados selecionado/completo/bloqueado e blocos coloridos |
 | `assets/cenario-oficina.jpg` | Cenário de fundo |
 | `assets/mascotes/*.png` | Mascotes com **fundo transparente** (recortados do mockup) |
+| `assets/jogo/` | Arte do gameplay gerada por IA: tubo, 10 peças, prateleira e estados (selecionado, válido, completo) |
 | `assets/originais/` | Assets originais do pacote (mantidos como estavam; não são mais usados) |
 | `fonts/` | Lilita One + Nunito (locais, funcionam offline) |
 | `referencias/` | Mockup e as 10 telas de referência |
