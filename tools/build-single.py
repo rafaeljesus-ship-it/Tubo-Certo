@@ -23,6 +23,8 @@ chars = {f[:-4]: b64('assets/personagens/' + f, 'image/png') for f in os.listdir
 js = js.replace("function charUrl(n) { return 'assets/personagens/' + n + '.png'; }", 'var CHARS = ' + json.dumps(chars) + ';\n  function charUrl(n) { return CHARS[n]; }')
 assert "'assets/jogo/" not in js and 'assets/jogo/peca-' not in js, 'sobrou caminho de arte'
 # o CSS também referencia a prateleira via border-image
+for _f in os.listdir('assets/personagens'):
+    css = css.replace("../assets/personagens/" + _f, b64('assets/personagens/' + _f, 'image/png'))
 css = css.replace("url('../assets/jogo/prateleira.png')", "url('" + art['prateleira.png'] + "')")
 html = open('index.html').read()
 html = re.sub(r'<link rel="stylesheet" href="css/style.css[^"]*">', lambda m: '<style>\n' + css + '\n</style>', html)

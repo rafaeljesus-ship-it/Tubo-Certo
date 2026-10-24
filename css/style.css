@@ -739,3 +739,24 @@ svg.ico.coin, .stars-row .ico.on, .win-star-top, .level-tile .stars .ico.on { fi
 .win-mascots img { object-fit: contain; object-position: 50% 100%; }
 .win-mascots .blue { left: 3% !important; height: 100% !important; max-width: 44%; }
 .win-mascots .red { right: 3% !important; height: 100% !important; max-width: 52%; }
+
+/* ==========================================================================
+   TELA DE RECOMPENSA — arte gerada por IA: botão verde com aro dourado e botões redondos dourados
+   (o texto do botão é dinâmico: ABRIR BAÚ → PRÓXIMO NÍVEL)
+   ========================================================================== */
+#winMainBtn {
+  width: 80cqw !important; height: 21.4cqw !important; padding: 0 6cqw !important;
+  background: url('../assets/personagens/botao-verde.png') center / 100% 100% no-repeat !important;
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important; filter: drop-shadow(0 .8cqw 0 rgba(27, 17, 9, .3));
+  font-size: 8.6cqw !important; letter-spacing: .02em; padding-bottom: .8cqw !important;
+}
+#winMainBtn:active { transform: translateY(3px); filter: drop-shadow(0 .2cqw 0 rgba(27, 17, 9, .3)); }
+#winMainBtn::before { display: none !important; }
+#winMainBtn span { text-shadow: 0 .5cqw 0 rgba(0, 0, 0, .28); }
+#view-win .round-row .round-btn { --sz: clamp(56px, 17cqw, 80px) !important; background-color: transparent !important; background-position: center; background-size: 100% 100%; background-repeat: no-repeat; border: 0 !important; box-shadow: none !important; filter: drop-shadow(0 .7cqw 0 rgba(27, 17, 9, .32)); }
+#view-win .round-row .round-btn::before { display: none; }
+#view-win .round-row .round-btn .ico { display: none; }
+#view-win .round-row .round-btn:active { transform: translateY(3px); }
+#winHomeBtn { background-image: url('../assets/personagens/botao-inicio.png') !important; }
+#winRetryBtn { background-image: url('../assets/personagens/botao-reiniciar.png') !important; }
+#winShareBtn { background-image: url('../assets/personagens/botao-compartilhar.png') !important; }
