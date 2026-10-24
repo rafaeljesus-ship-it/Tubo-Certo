@@ -8,19 +8,10 @@
   var E = window.TuboEngine;
   var CAP = E.CAP;
 
-  // Cores vivas de "tinta de quadrinho" (10 cores no máximo, ver colorsForLevel)
-  var BALL_COLORS = [
-    '#e5321f', // vermelho
-    '#ffcf1f', // amarelo
-    '#2d68c9', // azul
-    '#2eaa4f', // verde
-    '#8e44c2', // roxo
-    '#ff8a1c', // laranja
-    '#ff6fa6', // rosa
-    '#19bfd0', // ciano
-    '#7a4a24', // marrom
-    '#b7d62a'  // lima
-  ];
+  // Paleta do kit (tubo_certo_assets/blocks): a ordem é a do índice de cor do motor.
+  var COLOR_NAMES = ['red', 'yellow', 'blue', 'green', 'purple', 'orange', 'pink', 'cyan', 'lime', 'gray'];
+  var BALL_COLORS = ['#e5321f', '#ffcf1f', '#2d68c9', '#1fb98a', '#8e44c2', '#ff8a1c', '#ff6fa6', '#19bfd0', '#8fd02a', '#a9aca9']; // confete
+  var KIT = 'tubo_certo_assets/';
 
   var TEST_MODE = /[?&]teste=1/.test(location.search);
 
@@ -220,8 +211,9 @@
     return h;
   }
   function renderLives() {
-    $('gameLivesBtn').innerHTML = heartsHtml(state.lives, MAX_LIVES);
-    $('gameLivesBtn').setAttribute('aria-label', 'Vidas: ' + state.lives + ' de ' + MAX_LIVES);
+    var b = $('gameLivesBtn');
+    b.innerHTML = ico('heart', 'heart full') + '<b id="gameLivesNum">' + state.lives + '</b>';
+    b.setAttribute('aria-label', 'Vidas: ' + state.lives + ' de ' + MAX_LIVES);
     $('failLivesBadge').textContent = state.lives;
   }
   function renderLivesScreen() {
@@ -572,43 +564,56 @@
     }
   }
 
-  // --- layout adaptativo: escolhe 1–3 fileiras para deixar os tubos o maior possível
+  // --- layout adaptativo: escolhe 1–3 fileiras para maximizar o tamanho dos tubos,
+  // considerando a largura e a altura reais da área de jogo (HUD e barra de ferramentas já descontados).
+  var TUBE_ASPECT = 380 / 140;   // proporção do SVG do kit
   function layoutFor(n) {
-    var W = boardWrap.clientWidth - 8 - 24;
-    var H = boardWrap.clientHeight - 8 - 14 - Math.round(app.clientHeight * 0.07);
+    var area = boardWrap;
+    var cs = getComputedStyle(area);
+    var W = area.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var H = area.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
     if (W <= 0 || H <= 0) return null;
+    var pad = Math.max(10, Math.round(W * 0.035));
+    var maxTw = Math.min(W * 0.31, 120);
     var best = null;
     for (var r = 1; r <= 3; r++) {
       var per = Math.ceil(n / r);
-      var gap = per >= 6 ? 8 : (per === 5 ? 11 : 14);
-      var rowGap = 20;
-      var tw = Math.min(66, (W - gap * (per - 1)) / per);
-      var slotMax = ((H - (r - 1) * rowGap) / r - 52) / 4;
-      var slot = Math.min(tw * 0.72, slotMax, 48);
-      var eff = Math.min(tw, slot / 0.72);
-      if (slot < 16) continue;
-      var cand = { r: r, per: per, gap: gap, rowGap: rowGap, tw: Math.floor(eff), slot: Math.floor(Math.min(slot, eff * 0.72)), eff: eff };
-      // prefere o menor número de fileiras que ainda deixe os tubos confortáveis
-      if (eff >= 46) { best = cand; break; }
-      if (!best || eff > best.eff) best = cand;
+      var gap = Math.max(2, Math.round(W * 0.012));
+      var rowGap = Math.round(W * 0.012) + 4;
+      var shelf = Math.max(6, Math.round(W * 0.02));
+      var twW = (W - 2 * pad - 6 - (per - 1) * gap) / per;
+      var twH = ((H - 2 * pad - 6 - (r - 1) * rowGap) / r - shelf) / TUBE_ASPECT;
+      var tw = Math.floor(Math.min(twW, twH, maxTw));
+      if (tw < 24) continue;
+      if (!best || tw > best.tw + 1) {
+        // sobra de altura: reparte um pouco em respiro (entre fileiras e nas bordas), sem inflar o painel
+        var used = r * (tw * TUBE_ASPECT + shelf) + (r - 1) * rowGap + 2 * pad + 6;
+        var extra = Math.max(0, H - used);
+        best = { r: r, per: per, gap: gap, rowGap: rowGap + (r > 1 ? Math.min(extra * 0.35 / (r - 1), 30) : 0), shelf: shelf, pad: pad, padY: pad + Math.min(extra * 0.15, 22), tw: tw };
+      }
     }
-    if (!best) best = { r: 3, per: Math.ceil(n / 3), gap: 6, rowGap: 14, tw: 36, slot: 16, eff: 36 };
-    return best;
+    return best || { r: 3, per: Math.ceil(n / 3), gap: 4, rowGap: 8, shelf: 6, pad: 8, tw: 24 };
+  }
+
+  function segSvg(c, dropped) {
+    return '<svg class="seg' + (dropped ? ' just-dropped' : '') + '" viewBox="0 0 84 64" preserveAspectRatio="none" data-c="' + c + '" aria-hidden="true"><use href="#seg-' + COLOR_NAMES[c] + '"/></svg>';
   }
 
   function render() {
     var n = state.tubes.length;
     board.innerHTML = '';
     if (n) {
-      var L = layoutFor(n) || { r: 1, per: n, gap: 10, rowGap: 16, tw: 48, slot: 32 };
+      var L = layoutFor(n) || { r: 1, per: n, gap: 10, rowGap: 16, shelf: 8, pad: 12, tw: 50 };
+      var panel = $('boardPanel');
+      panel.style.setProperty('--pad', L.pad + 'px');
+      panel.style.setProperty('--padY', (L.padY || L.pad) + 'px');
       board.style.setProperty('--tw', L.tw + 'px');
-      board.style.setProperty('--slot', L.slot + 'px');
       board.style.setProperty('--tgap', L.gap + 'px');
       board.style.setProperty('--rowgap', L.rowGap + 'px');
-      var rows = [];
+      board.style.setProperty('--shelf', L.shelf + 'px');
       var per = Math.ceil(n / L.r);
-      for (var r = 0; r < L.r; r++) rows.push(document.createElement('div'));
-      rows.forEach(function (row) { row.className = 'tube-row'; board.appendChild(row); });
+      var rows = [];
+      for (var r = 0; r < L.r; r++) { var row = document.createElement('div'); row.className = 'tube-row'; board.appendChild(row); rows.push(row); }
       state.tubes.forEach(function (tube, idx) {
         var status = E.tubeStatus(tube);
         var el = document.createElement('button');
@@ -619,16 +624,13 @@
         if (state.hint && (state.hint.from === idx || state.hint.to === idx)) cls.push('hint');
         el.className = cls.join(' ');
         el.setAttribute('aria-label', 'Tubo ' + (idx + 1) + ', ' + tube.length + ' de ' + CAP + ' cheio' + (state.selected === idx ? ', selecionado' : ''));
-        var glass = document.createElement('div');
-        glass.className = 'glass';
-        tube.forEach(function (c, bi) {
-          var seg = document.createElement('div');
-          seg.className = 'seg' + (idx === state.lastPourTo && bi === tube.length - 1 ? ' just-dropped' : '');
-          seg.style.setProperty('--c', BALL_COLORS[c]);
-          seg.setAttribute('data-c', c);
-          glass.appendChild(seg);
-        });
-        el.appendChild(glass);
+        var layers = '<div class="layers">';
+        tube.forEach(function (c, bi) { layers += segSvg(c, idx === state.lastPourTo && bi === tube.length - 1); });
+        layers += '</div>';
+        el.innerHTML = layers +
+          '<img class="glass-layer" src="' + KIT + 'tubes/tube-glass-overlay.svg" alt="" draggable="false">' +
+          '<img class="st-sel" src="' + KIT + 'tubes/tube-selected-overlay.svg" alt="" draggable="false">' +
+          '<img class="st-done" src="' + KIT + 'tubes/tube-complete-overlay.svg" alt="" draggable="false">';
         el.addEventListener('click', function () { handleTubeClick(idx); });
         rows[Math.min(L.r - 1, Math.floor(idx / per))].appendChild(el);
       });
@@ -887,6 +889,7 @@
 
   // ===================== Início =====================
   function start() {
+    ['tube-glass-overlay', 'tube-selected-overlay', 'tube-complete-overlay'].forEach(function (n) { new Image().src = KIT + 'tubes/' + n + '.svg'; });
     state.coins = loadCoins();
     syncLives();
     renderLives();

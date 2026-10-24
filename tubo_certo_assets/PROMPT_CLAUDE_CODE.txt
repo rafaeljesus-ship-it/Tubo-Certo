@@ -1,0 +1,9 @@
+INTEGRE O KIT DE ASSETS DO TUBO CERTO NO JOGO EXISTENTE
+
+Leia primeiro o README.md e abra preview.html para conferir os assets. Use os SVGs de tubes/ como camadas transparentes de vidro/estado e os SVGs de blocks/ como referência visual dos quadradinhos. Não use a prancha de referência como imagem de fundo nem como tela achatada.
+
+Implemente os tubos e peças como componentes reais, responsivos e interativos. Cada tubo deve conter camadas coloridas independentes e continuar usando a lógica atual de transferência de cores. Posicione tube-glass-overlay.svg por cima das peças para reproduzir vidro, aro e contorno. Aplique tube-selected-overlay.svg apenas no tubo selecionado, tube-complete-overlay.svg quando estiver completo e tube-locked-overlay.svg para estados bloqueados.
+
+Os blocos quadrados em blocks/ são assets visuais de referência; para as camadas estreitas dentro dos tubos, crie elementos de segmento usando a paleta e acabamento desses SVGs, adequando a altura à capacidade de cada tubo. Não use os quadrados 100x100 literalmente se eles não couberem.
+
+Preserve toda a lógica, navegação, economia, progresso e botões atuais. Faça backup antes de editar. Teste responsividade em telas estreitas, movimentos válidos e inválidos, vitória, desfazer, dica, tubo extra e reiniciar. Corrija sobreposições e qualquer peça cortada antes de concluir.

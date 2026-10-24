@@ -22,12 +22,13 @@ Sem esse parâmetro, as compras em dinheiro mostram um aviso de "pagamento indis
 | `css/style.css` | Todo o visual (unidades `cqw` = % da largura do aparelho) |
 | `js/engine.js` | Motor do puzzle (regras, gerador de fases, solver A*, dica) — sem DOM |
 | `js/game.js` | Interface, navegação, moedas, vidas, reforços, ranking, configurações, áudio |
+| `tubo_certo_assets/` | Kit visual de gameplay (SVG): vidro, estados selecionado/completo/bloqueado e blocos coloridos |
 | `assets/cenario-oficina.jpg` | Cenário de fundo |
 | `assets/mascotes/*.png` | Mascotes com **fundo transparente** (recortados do mockup) |
 | `assets/originais/` | Assets originais do pacote (mantidos como estavam; não são mais usados) |
 | `fonts/` | Lilita One + Nunito (locais, funcionam offline) |
 | `referencias/` | Mockup e as 10 telas de referência |
-| `codigo/` | Backups do código anterior (`tubo-certo-refinado-backup.html` = `index.html` de antes) |
+| `codigo/` | Backups do código anterior (`backup-pre-kit/` = arquivos antes da reformulação do gameplay) |
 | `tests/e2e.js` | Teste ponta a ponta com Playwright |
 
 ## Telas
@@ -61,3 +62,9 @@ NODE_PATH=$(npm root -g) node tests/e2e.js /pasta/das/capturas
 - **Ranking é demonstração local** (sem servidor); só a pontuação do jogador é real.
 - Mascotes foram recortados do mockup por IA (resolução ~640 px de altura); podem ter pequenas imperfeições de borda.
 - Música de fundo é procedural (WebAudio), simples; o navegador só libera áudio após o primeiro toque.
+
+## Gameplay (kit de assets)
+
+Cada tubo é um `<button>` com camadas independentes: segmentos coloridos (SVG `<use>` da paleta do kit), `tube-glass-overlay.svg` por cima,
+`tube-selected-overlay.svg` (selecionado) e `tube-complete-overlay.svg` (completo). `tube-locked-overlay.svg` está no kit, mas o jogo não tem tubo bloqueado, então não é usado.
+O layout (`layoutFor` em `js/game.js`) mede a área de jogo real e escolhe 1–3 fileiras para maximizar o tamanho dos tubos.
